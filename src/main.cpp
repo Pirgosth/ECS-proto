@@ -2,59 +2,42 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Engine/ECS/ComponentManager.hpp"
+#include "Engine/ECS/Engine.hpp"
 #include "Engine/ECS/System.hpp"
 
-class Test: public Component {
+class Health : public Component
+{
 public:
     int health;
 
-    Test(int health = 100): health(health) {}
+    Health(int health) : health(health) {}
 };
 
-class SubTest: public Test {
-public:
-    SubTest(int health): Test(health) {}
-};
+class HealthSystem : public System<Health>
+{
+    virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Health>>> entities) override
+    {
+        std::cout << "Update from HealthSystem !" << std::endl;
+        for (auto [entity, components] : entities)
+        {
+            auto healthComponent = getComponent<Health>(components);
+            healthComponent->health--;
+            std::cout << entity << "; " << healthComponent->health << std::endl;
+        }
+    }
+}; 
 
 int main()
 {
-    ComponentManager manager = ComponentManager::getInstance();
-    manager.addComponent(new Test());
-    manager.addComponent(new Test(50));
-    manager.addComponent(new SubTest(-120));
+    Engine engine;
+    engine.registerSystem(new HealthSystem());
 
-    manager.addComponent(new Test(30));
+    engine.addComponent(engine.makeEntity(), new Health(60));
+    engine.addComponent(engine.makeEntity(), new Health(150));
+    engine.addComponent(engine.makeEntity(), new Health(80));
 
-    // for (auto component : manager.getComponents<Test>())
-    // {
-    //     std::cout << component->health << std::endl;
-    // }
-
-    // for (auto component : manager.getComponents<SubTest>())
-    // {
-    //     std::cout << component->health << std::endl;
-    // }
-
-    System<Test*, SubTest*> SystemA;
-    System<SubTest*> SystemB;
-    // std::cout << SystemA.getId() << std::endl;
-    // std::cout << SystemA.getId() << std::endl;
-
-    // std::cout << SystemB.getId() << std::endl;
-
-    for (auto componentId : SystemA.getComponentIds())
-    {
-        std::cout << componentId << "; ";
-    }
-
-    std::cout << std::endl;
-
-    for (auto componentId : SystemB.getComponentIds())
-    {
-        std::cout << componentId << "; ";
-    }
-
+    engine.update();
+    engine.update();
 
     return 0;
 }

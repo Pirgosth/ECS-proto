@@ -1,6 +1,6 @@
 #include "ComponentManager.hpp"
 
-int ComponentManager::g_componentCount = 0;
+ComponentId ComponentManager::g_componentCount = 0u;
 
 ComponentManager &ComponentManager::getInstance()
 {

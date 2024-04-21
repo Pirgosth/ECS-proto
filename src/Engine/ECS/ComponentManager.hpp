@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Engine/ECS/Component.hpp"
+#include "Engine/ECS/Types.hpp"
 
 class BaseComponentPool
 {
@@ -23,17 +24,17 @@ public:
 class ComponentManager
 {
 private:
-    static int g_componentCount;
+    static ComponentId g_componentCount;
     template <typename T>
-    static int _getId();
+    static ComponentId _getId();
     ComponentManager() = default;
     std::unordered_map<int, std::shared_ptr<BaseComponentPool>> m_components;
 
 public:
     template <typename T>
-    static int getId();
+    static ComponentId getId();
     template <typename T>
-    static int getId(T t);
+    static ComponentId getId(T);
     static ComponentManager &getInstance();
     template <typename T>
     void addComponent(T *t);
@@ -42,20 +43,20 @@ public:
 };
 
 template <typename T>
-inline int ComponentManager::_getId()
+inline ComponentId ComponentManager::_getId()
 {
     static int componentId = ++g_componentCount;
     return componentId;
 }
 
 template <typename T>
-inline int ComponentManager::getId()
+inline ComponentId ComponentManager::getId()
 {
     return _getId<std::remove_cv_t<std::remove_reference_t<T>>>();
 }
 
 template <typename T>
-inline int ComponentManager::getId(T t)
+inline ComponentId ComponentManager::getId(T)
 {
     return getId<T>();
 }
@@ -63,7 +64,7 @@ inline int ComponentManager::getId(T t)
 template <typename T>
 inline void ComponentManager::addComponent(T *t)
 {
-    int id = getId(t);
+    ComponentId id = getId<T>();
 
     if (m_components.count(id) == 0)
     {
@@ -80,7 +81,7 @@ inline void ComponentManager::addComponent(T *t)
 template <typename T>
 inline std::vector<std::shared_ptr<T>> &ComponentManager::getComponents()
 {
-    BaseComponentPool &rawPool = *m_components.at(getId<T*>());
+    BaseComponentPool &rawPool = *m_components.at(getId<T *>());
     return static_cast<ComponentPool<T> &>(rawPool).components;
 }
 
