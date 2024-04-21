@@ -29,12 +29,12 @@ void ArchetypeGraph::addComponent(EntityId id, ComponentId componentId, Componen
     ArchetypeSignature signature;
     std::map<ComponentId, std::shared_ptr<Component>> components;
 
-    for (auto [_, archetypes]: m_archetypes)
+    for (auto &[_, archetype] : m_archetypes)
     {
-        if (archetypes.removeEntity(id))
+        if (archetype.removeEntity(id))
         {
-            signature = archetypes.getSignature();
-            components = archetypes.getComponents(id);
+            signature = archetype.getSignature();
+            components = archetype.getComponents(id);
             break;
         }
     }
