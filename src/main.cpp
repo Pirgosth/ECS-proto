@@ -1,43 +1,94 @@
 #include <iostream>
+#include <string>
 
 #include <SFML/Graphics.hpp>
 
 #include "Engine/ECS/Engine.hpp"
-#include "Engine/ECS/System.hpp"
+#include "Engine/ECS/System/MonoSystem.hpp"
+#include "Engine/ECS/System/System.hpp"
 
-class Health : public Component
+class SpriteSystem;
+
+class Sprite : public Component
+{
+    friend SpriteSystem;
+
+private:
+    sf::Texture m_texture;
+    sf::Sprite m_sprite;
+
+public:
+    void setSprite(std::string spritePath)
+    {
+        m_texture.loadFromFile(spritePath);
+        m_sprite.setTexture(m_texture);
+    }
+
+    Sprite(std::string spritePath)
+    {
+        setSprite(spritePath);
+    }
+};
+
+class Test : public Component
 {
 public:
     int health;
-
-    Health(int health) : health(health) {}
+    Test(int health = 100) : health(health)
+    {
+    }
 };
 
-class HealthSystem : public System<Health>
+class TestSystem : public System<Sprite, Test>
 {
-    virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Health>>> entities) override
+    virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Sprite>, std::shared_ptr<Test>>> entities) override
     {
-        std::cout << "Update from HealthSystem !" << std::endl;
-        for (auto [entity, components] : entities)
+        for (auto [_, components] : entities)
         {
-            auto healthComponent = getComponent<Health>(components);
-            healthComponent->health--;
-            std::cout << entity << "; " << healthComponent->health << std::endl;
+            auto test = getComponent<Test>(components);
+            std::cout << test->health << std::endl;
         }
     }
-}; 
+};
+
+class SpriteSystem : public MonoSystem<Sprite>
+{
+private:
+    sf::RenderWindow &m_window;
+    virtual void update(std::map<EntityId, std::shared_ptr<Sprite>> entities) override
+    {
+        m_window.clear();
+
+        for (auto [_, sprite] : entities)
+        {
+            m_window.draw(sprite->m_sprite);
+        }
+
+        m_window.display();
+    }
+
+public:
+    SpriteSystem(sf::RenderWindow &window) : m_window(window)
+    {
+    }
+};
 
 int main()
 {
     Engine engine;
-    engine.registerSystem(new HealthSystem());
 
-    engine.addComponent(engine.makeEntity(), new Health(60));
-    engine.addComponent(engine.makeEntity(), new Health(150));
-    engine.addComponent(engine.makeEntity(), new Health(80));
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "ECS", sf::Style::Default);
 
-    engine.update();
-    engine.update();
+    engine.registerSystem(new SpriteSystem(window));
+    engine.registerSystem(new TestSystem());
+
+    engine.addComponent(engine.makeEntity(), new Sprite("assets/spritesheet.png"));
+    // engine.addComponent(0, new Test(42));
+
+    while (true)
+    {
+        engine.update();
+    }
 
     return 0;
 }

@@ -31,10 +31,11 @@ void ArchetypeGraph::addComponent(EntityId id, ComponentId componentId, Componen
 
     for (auto &[_, archetype] : m_archetypes)
     {
-        if (archetype.removeEntity(id))
+        if (archetype.doesContainsEntity(id))
         {
             signature = archetype.getSignature();
             components = archetype.getComponents(id);
+            archetype.removeEntity(id);
             break;
         }
     }

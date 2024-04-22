@@ -7,7 +7,7 @@
 #include "Engine/ECS/ArchetypeGraph.hpp"
 #include "Engine/ECS/Component.hpp"
 #include "Engine/ECS/ComponentManager.hpp"
-#include "Engine/ECS/System.hpp"
+#include "Engine/ECS/System/BaseSystem.hpp"
 
 class Engine
 {
