@@ -2,9 +2,8 @@
 
 unsigned int Archetype::g_ArchetypeCount = 0;
 
-Archetype::Archetype(ArchetypeSignature signature) : m_id(++g_ArchetypeCount), m_signature(std::move(signature))
+Archetype::Archetype() : m_id(++g_ArchetypeCount)
 {
-    std::sort(m_signature.begin(), m_signature.end());
 }
 
 int Archetype::getId() const
@@ -33,11 +32,6 @@ bool Archetype::removeEntity(EntityId id)
     m_entities.erase(id);
 
     return true;
-}
-
-ArchetypeSignature Archetype::getSignature() const
-{
-    return m_signature;
 }
 
 std::map<EntityId, std::map<ComponentId, std::shared_ptr<Component>>> &Archetype::getEntities()

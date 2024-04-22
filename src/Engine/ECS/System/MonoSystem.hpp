@@ -19,7 +19,7 @@ private:
     static ArchetypeSignature computeSignature();
 
     ArchetypeSignature m_componentsIds;
-    virtual void notifyUpdate(std::vector<Archetype> archetypes) override;
+    virtual void notifyUpdate(std::vector<Archetype *> archetypes) override;
     virtual ArchetypeSignature getSignature() const override;
     std::shared_ptr<SingleComponent> parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> rawComponents);
 
@@ -37,17 +37,15 @@ inline ArchetypeSignature MonoSystem<SingleComponent>::computeSignature()
 }
 
 template <typename SingleComponent>
-inline void MonoSystem<SingleComponent>::notifyUpdate(std::vector<Archetype> archetypes)
+inline void MonoSystem<SingleComponent>::notifyUpdate(std::vector<Archetype *> archetypes)
 {
+    std::map<EntityId, std::shared_ptr<SingleComponent>> entites;
     for (auto archetype : archetypes)
     {
-        std::map<EntityId, std::shared_ptr<SingleComponent>> entites;
-
-        for (auto [entityId, rawComponents] : archetype.getEntities())
+        for (auto [entityId, rawComponents] : archetype->getEntities())
             entites.emplace(entityId, parseRawComponent(rawComponents));
-
-        update(entites);
     }
+    update(entites);
 }
 
 template <typename SingleComponent>

@@ -1,48 +1,43 @@
 #include "ArchetypeGraph.hpp"
 
-Archetype &ArchetypeGraph::getOrCreateArchetype(ArchetypeSignature signature)
+std::vector<Archetype *> ArchetypeGraph::getCompatibleArchetypes(ArchetypeSignature signature)
 {
-    if (m_archetypes.count(signature) == 0)
-        m_archetypes.emplace(signature, std::move(Archetype(signature)));
-
-    return m_archetypes.at(signature);
-}
-
-std::vector<Archetype> ArchetypeGraph::getCompatibleArchetypes(ArchetypeSignature signature)
-{
-    std::vector<Archetype> archetypes;
-    if (m_archetypes.count(signature) != 0)
-        archetypes.push_back(m_archetypes.at(signature));
-
-    return archetypes;
+    return m_graph.getAllCompatibleArchetypes(signature);
 }
 
 void ArchetypeGraph::createEntity(EntityId id)
 {
-    Archetype &archetype = getOrCreateArchetype(ArchetypeSignature());
+    if (m_entitiesSignatures.count(id) == 0)
+    {
+        m_entitiesSignatures.emplace(id, ArchetypeSignature());
+    }
+
+    auto entitySignature = m_entitiesSignatures.at(id);
+
+    Archetype &archetype = m_graph.getOrCreateArchetype(entitySignature);
     if (!archetype.doesContainsEntity(id))
         archetype.addEntity(id, std::map<EntityId, std::shared_ptr<Component>>());
 }
 
 void ArchetypeGraph::addComponent(EntityId id, ComponentId componentId, Component *component)
 {
-    ArchetypeSignature signature;
+    // In this case, entity id is invalid or entity does not exists.
+    if (m_entitiesSignatures.count(id) == 0)
+        return;
+
+    ArchetypeSignature &entitySignature = m_entitiesSignatures.at(id);
     std::map<ComponentId, std::shared_ptr<Component>> components;
 
-    for (auto &[_, archetype] : m_archetypes)
+    Archetype &oldArchetype = m_graph.getOrCreateArchetype(entitySignature);
+    if (oldArchetype.doesContainsEntity(id))
     {
-        if (archetype.doesContainsEntity(id))
-        {
-            signature = archetype.getSignature();
-            components = archetype.getComponents(id);
-            archetype.removeEntity(id);
-            break;
-        }
+        components = oldArchetype.getComponents(id);
+        oldArchetype.removeEntity(id);
     }
 
-    signature.push_back(componentId);
+    entitySignature.push_back(componentId);
     components.emplace(componentId, std::shared_ptr<Component>(component));
 
-    Archetype &matchingArchetype = getOrCreateArchetype(signature);
-    matchingArchetype.addEntity(id, components);
+    Archetype &newArchetype = m_graph.getOrCreateArchetype(entitySignature);
+    newArchetype.addEntity(id, components);
 }

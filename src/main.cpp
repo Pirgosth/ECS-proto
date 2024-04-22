@@ -39,14 +39,17 @@ public:
     }
 };
 
-class TestSystem : public System<Sprite, Test>
+class TestSystem : public MonoSystem<Test>
 {
-    virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Sprite>, std::shared_ptr<Test>>> entities) override
+    virtual void update(std::map<EntityId, std::shared_ptr<Test>> entities) override
     {
-        for (auto [_, components] : entities)
+        for (auto [_, test] : entities)
         {
-            auto test = getComponent<Test>(components);
-            std::cout << test->health << std::endl;
+            if (test->health >= 0)
+            {
+                std::cout << test->health << std::endl;
+                test->health--;
+            }
         }
     }
 };
@@ -82,8 +85,13 @@ int main()
     engine.registerSystem(new SpriteSystem(window));
     engine.registerSystem(new TestSystem());
 
-    engine.addComponent(engine.makeEntity(), new Sprite("assets/spritesheet.png"));
-    // engine.addComponent(0, new Test(42));
+    std::cout << ComponentManager::getId<Test>() << std::endl;
+    std::cout << ComponentManager::getId<Sprite>() << std::endl;
+
+    EntityId entity = engine.makeEntity();
+
+    engine.addComponent(entity, new Test(42));
+    engine.addComponent(entity, new Sprite("assets/spritesheet.png"));
 
     while (true)
     {

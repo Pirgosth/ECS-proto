@@ -25,7 +25,7 @@ private:
     static std::tuple<std::shared_ptr<Components>...> parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> rawComponents);
 
     ArchetypeSignature m_componentsIds;
-    virtual void notifyUpdate(std::vector<Archetype> archetypes) override;
+    virtual void notifyUpdate(std::vector<Archetype *> archetypes) override;
     virtual ArchetypeSignature getSignature() const override;
 
 protected:
@@ -66,17 +66,16 @@ inline std::tuple<std::shared_ptr<Components>...> System<Components...>::parseRa
 }
 
 template <typename... Components>
-inline void System<Components...>::notifyUpdate(std::vector<Archetype> archetypes)
+inline void System<Components...>::notifyUpdate(std::vector<Archetype *> archetypes)
 {
+    std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entites;
     for (auto archetype : archetypes)
     {
-        std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entites;
-
-        for (auto [entityId, rawComponents] : archetype.getEntities())
+        for (auto [entityId, rawComponents] : archetype->getEntities())
             entites.emplace(entityId, parseRawComponents(rawComponents));
-
-        update(entites);
     }
+    update(entites);
+
 }
 
 template <typename... Components>

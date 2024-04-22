@@ -15,16 +15,14 @@ private:
     static unsigned int g_ArchetypeCount;
     const unsigned int m_id;
 
-    ArchetypeSignature m_signature;
     std::map<EntityId, std::map<ComponentId, std::shared_ptr<Component>>> m_entities;
 
 public:
-    Archetype(ArchetypeSignature signature);
+    Archetype();
     int getId() const;
     bool doesContainsEntity(EntityId id) const;
     void addEntity(EntityId id, std::map<ComponentId, std::shared_ptr<Component>> components);
     bool removeEntity(EntityId id);
-    ArchetypeSignature getSignature() const;
     std::map<EntityId, std::map<ComponentId, std::shared_ptr<Component>>> &getEntities();
     std::map<ComponentId, std::shared_ptr<Component>> getComponents(EntityId id);
 };

@@ -5,17 +5,19 @@
 #include <vector>
 
 #include "Engine/ECS/Archetype/Archetype.hpp"
+#include "Engine/ECS/Archetype/ArchetypeNode.hpp"
 #include "Engine/ECS/ComponentManager.hpp"
 #include "Engine/ECS/Types.hpp"
 
 class ArchetypeGraph
 {
 private:
-    std::map<ArchetypeSignature, Archetype> m_archetypes;
-    Archetype &getOrCreateArchetype(ArchetypeSignature signature);
+    ArchetypeNode m_graph;
+    std::map<EntityId, ArchetypeSignature> m_entitiesSignatures;
     void addComponent(EntityId id, ComponentId componentId, Component *component);
+
 public:
-    std::vector<Archetype> getCompatibleArchetypes(ArchetypeSignature signature);
+    std::vector<Archetype *> getCompatibleArchetypes(ArchetypeSignature signature);
     void createEntity(EntityId id);
     template <typename T>
     void addComponent(EntityId id, T *component);
