@@ -6,7 +6,7 @@
 #include <tuple>
 #include <vector>
 
-#include "Engine/ECS/Archetype.hpp"
+#include "Engine/ECS/Archetype/Archetype.hpp"
 #include "Engine/ECS/Component.hpp"
 #include "Engine/ECS/ComponentManager.hpp"
 #include "Engine/ECS/Types.hpp"
