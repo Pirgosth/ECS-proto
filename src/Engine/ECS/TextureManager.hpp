@@ -1,3 +1,6 @@
+#ifndef TEXTUREMANAGER_H_INCLUDED
+#define TEXTUREMANAGER_H_INCLUDED
+
 #include <unordered_map>
 #include <memory>
 #include <string>
@@ -11,3 +14,5 @@ private:
 public:
     std::shared_ptr<sf::Texture> getOrCreateTexture(std::string texturePath);
 };
+
+#endif //TEXTUREMANAGER_H_INCLUDED

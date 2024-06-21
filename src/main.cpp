@@ -5,6 +5,8 @@
 
 #include "Engine/ECS/Engine.hpp"
 #include "Engine/ECS/System/Implementation/SpriteSystem.hpp"
+#include "Engine/ECS/System/Implementation/AnimatedSpriteSystem.hpp"
+#include "Engine/ECS/Component/AnimatedSprite.hpp"
 
 int main()
 {
@@ -13,10 +15,15 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1280, 720), "ECS", sf::Style::Default);
 
     engine.registerSystem(new SpriteSystem(window));
+    engine.registerSystem(new AnimatedSpriteSystem(window));
 
-    EntityId entity = engine.makeEntity();
+    for (int i = 0; i < 12; i++)
+    {
+        auto sprite = engine.makeEntity();
 
-    engine.addComponent(entity, new Sprite("assets/spritesheet.png"));
+        engine.addComponent(sprite, new Transform(sf::Vector2f(50 + 40 * i, 300)));
+        engine.addComponent(sprite, new AnimatedSprite("assets/spritesheets/green.json", 6));
+    }
 
     bool isRunning = true;
 
@@ -28,7 +35,10 @@ int main()
             if (event.type == sf::Event::Closed)
                 isRunning = false;
         }
+
+        window.clear();
         engine.update();
+        window.display();
     }
 
     return 0;

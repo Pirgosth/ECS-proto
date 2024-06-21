@@ -1,15 +1,13 @@
 #include "SpriteSystem.hpp"
 
-void SpriteSystem::update(std::map<EntityId, std::shared_ptr<Sprite>> entities)
+void SpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<Sprite>>> entities)
 {
-    m_window.clear();
-
-    for (auto [_, sprite] : entities)
+    for (auto [_, components] : entities)
     {
+        auto [transform, sprite] = components;
+        sprite->m_sprite.setPosition(transform->m_position);
         m_window.draw(sprite->m_sprite);
     }
-
-    m_window.display();
 }
 
 SpriteSystem::SpriteSystem(sf::RenderWindow &window): m_window(window) {}
