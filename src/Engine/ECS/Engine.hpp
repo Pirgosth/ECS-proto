@@ -1,11 +1,12 @@
 #ifndef ENGINE_H_INCLUDED
 #define ENGINE_H_INCLUDED
 
+#include <unordered_map>
 #include <memory>
 #include <vector>
 
 #include "Engine/ECS/Archetype/ArchetypeGraph.hpp"
-#include "Engine/ECS/Component.hpp"
+#include "Engine/ECS/Component/Component.hpp"
 #include "Engine/ECS/ComponentManager.hpp"
 #include "Engine/ECS/System/BaseSystem.hpp"
 
@@ -15,6 +16,7 @@ private:
     static EntityId g_EntitiesCount;
 
     ArchetypeGraph m_archetypeGraph;
+    std::unordered_map<EntityId, ArchetypeSignature> m_entitiesSignatures;
     std::vector<std::shared_ptr<BaseSystem>> m_systems;
 
 public:
@@ -28,7 +30,13 @@ public:
 template <typename T>
 inline void Engine::addComponent(EntityId id, T *component)
 {
-    m_archetypeGraph.addComponent(id, component);
+    // In this case, entity id is invalid or entity does not exist anymore.
+    if (m_entitiesSignatures.count(id) == 0)
+        return;
+
+    auto& signature = m_entitiesSignatures.at(id);
+
+    m_archetypeGraph.addComponent(id, component, signature);
 }
 
 #endif // ENGINE_H_INCLUDED

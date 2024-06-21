@@ -13,20 +13,19 @@ class ArchetypeGraph
 {
 private:
     ArchetypeNode m_graph;
-    std::map<EntityId, ArchetypeSignature> m_entitiesSignatures;
-    void addComponent(EntityId id, ComponentId componentId, Component *component);
+    void addComponent(EntityId id, ComponentId componentId, Component *component, ArchetypeSignature &signature);
 
 public:
     std::vector<Archetype *> getCompatibleArchetypes(ArchetypeSignature signature);
-    void createEntity(EntityId id);
+    void createEntity(EntityId id, ArchetypeSignature signature);
     template <typename T>
-    void addComponent(EntityId id, T *component);
+    void addComponent(EntityId id, T *component, ArchetypeSignature &signature);
 };
 
 template <typename T>
-inline void ArchetypeGraph::addComponent(EntityId id, T *component)
+inline void ArchetypeGraph::addComponent(EntityId id, T *component, ArchetypeSignature &signature)
 {
-    addComponent(id, ComponentManager::getId<T>(), component);
+    addComponent(id, ComponentManager::getId<T>(), component, signature);
 }
 
 #endif // ARCHETYPEGRAPH_H_INCLUDED

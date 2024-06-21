@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "Engine/ECS/Component.hpp"
+#include "Engine/ECS/Component/Component.hpp"
 #include "Engine/ECS/Types.hpp"
 
 class Archetype

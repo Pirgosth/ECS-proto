@@ -19,6 +19,14 @@ void Engine::registerSystem(BaseSystem *system)
 EntityId Engine::makeEntity()
 {
     EntityId id = g_EntitiesCount++;
-    m_archetypeGraph.createEntity(id);
+
+    if (m_entitiesSignatures.count(id) == 0)
+    {
+        m_entitiesSignatures.emplace(id, ArchetypeSignature());
+    }
+
+    auto signature = m_entitiesSignatures.at(id);
+
+    m_archetypeGraph.createEntity(id, signature);
     return id;
 }

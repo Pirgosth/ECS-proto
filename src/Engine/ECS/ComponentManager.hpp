@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Engine/ECS/Component.hpp"
+#include "Engine/ECS/Component/Component.hpp"
 #include "Engine/ECS/Types.hpp"
 
 class BaseComponentPool
