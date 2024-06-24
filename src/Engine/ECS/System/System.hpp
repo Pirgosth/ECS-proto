@@ -2,6 +2,7 @@
 #define SYSTEM_H_INCLUDED
 
 #include <algorithm>
+#include <cassert>
 #include <memory>
 #include <tuple>
 #include <vector>
@@ -25,10 +26,12 @@ private:
     static std::tuple<std::shared_ptr<Components>...> parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> rawComponents);
 
     ArchetypeSignature m_componentsIds;
+    virtual void notifyInit(std::vector<Archetype *> archetypes) override;
     virtual void notifyUpdate(std::vector<Archetype *> archetypes) override;
     virtual ArchetypeSignature getSignature() const override;
 
 protected:
+    virtual void init(std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entities);
     virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entities) = 0;
     template <typename T>
     static std::shared_ptr<T> getComponent(std::tuple<std::shared_ptr<Components>...> components);
@@ -55,6 +58,7 @@ template <typename... Components>
 template <typename T>
 inline std::shared_ptr<T> System<Components...>::parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> rawComponents)
 {
+    assert(rawComponents.count(ComponentManager::getId<T>()) != 0 && "Invalid entities provided to this system");
     std::shared_ptr<Component> t = rawComponents.at(ComponentManager::getId<T>());
     return std::static_pointer_cast<T>(t);
 }
@@ -63,6 +67,18 @@ template <typename... Components>
 inline std::tuple<std::shared_ptr<Components>...> System<Components...>::parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> rawComponents)
 {
     return std::make_tuple(parseRawComponent<Components>(rawComponents)...);
+}
+
+template <typename... Components>
+inline void System<Components...>::notifyInit(std::vector<Archetype *> archetypes)
+{
+    std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entites;
+    for (auto archetype : archetypes)
+    {
+        for (auto [entityId, rawComponents] : archetype->getEntities())
+            entites.emplace(entityId, parseRawComponents(rawComponents));
+    }
+    init(entites);
 }
 
 template <typename... Components>
@@ -89,6 +105,9 @@ inline ArchetypeSignature System<Components...>::getSignature() const
 {
     return m_componentsIds;
 }
+
+template <typename... Components>
+inline void System<Components...>::init(std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entities) {}
 
 template <typename... Components>
 template <typename T>

@@ -10,22 +10,6 @@
 
 #include "Engine/ECS/System/MonoSystem.hpp"
 
-class DummyComponent: public Component
-{
-
-};
-
-class DummySystem: public MonoSystem<DummyComponent>
-{
-    virtual void update(std::map<EntityId, std::shared_ptr<DummyComponent>> entities) override
-    {
-        for (auto [entityId, dummy]: entities)
-        {
-            std::cout << "Dummy component detected for entity id: " << entityId << std::endl;
-        }
-    }
-};
-
 int main()
 {
     Engine engine;
@@ -34,10 +18,6 @@ int main()
 
     engine.registerSystem(new SpriteSystem(window));
     engine.registerSystem(new AnimatedSpriteSystem(window));
-    engine.registerSystem(new DummySystem());
-
-    auto dummy = engine.makeEntity();
-    engine.addComponent(dummy, new DummyComponent());
 
     for (int i = 0; i < 12; i++)
     {
@@ -48,7 +28,6 @@ int main()
     }
 
     auto testEntity = engine.makeEntity();
-    engine.addComponent(testEntity, new DummyComponent());
     engine.addComponent(testEntity, new Transform(sf::Vector2f(0, 0)));
     engine.addComponent(testEntity, new AnimatedSprite("assets/spritesheets/green.json", 6));
 

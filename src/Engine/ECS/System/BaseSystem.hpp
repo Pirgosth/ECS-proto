@@ -16,6 +16,7 @@ class BaseSystem
     friend Engine;
 
 protected:
+    virtual void notifyInit(std::vector<Archetype *> archetypes) = 0;
     virtual void notifyUpdate(std::vector<Archetype *> archetypes) = 0;
     virtual ArchetypeSignature getSignature() const = 0;
 };

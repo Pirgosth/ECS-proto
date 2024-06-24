@@ -1,5 +1,16 @@
 #include "AnimatedSpriteSystem.hpp"
 
+void AnimatedSpriteSystem::init(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> entities)
+{
+    for (auto [entityId, components] : entities)
+    {
+        auto [transform, animatedSprite] = components;
+        auto activeSprite = getOrCreateSprite(entityId, *animatedSprite);
+
+        activeSprite->sprite.setPosition(transform->m_position);
+    }
+}
+
 void AnimatedSpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> entities)
 {
     for (auto [entityId, components] : entities)
@@ -14,7 +25,6 @@ void AnimatedSpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<
             activeSprite->clock.restart();
         }
 
-        activeSprite->sprite.setPosition(transform->m_position);
         m_window.draw(activeSprite->sprite);
     }
 }
