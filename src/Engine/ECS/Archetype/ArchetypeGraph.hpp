@@ -16,20 +16,20 @@ class ArchetypeGraph
 private:
     ArchetypeNode m_graph;
     std::unordered_map<ComponentId, std::unordered_set<ArchetypeNode *>> m_componentArchetypes;
-    void addComponent(EntityId id, ComponentId componentId, Component *component, ArchetypeSignature &signature);
+    std::map<ComponentId, std::shared_ptr<Component>> addComponent(EntityId id, ComponentId componentId, Component *component, ArchetypeSignature &signature);
 
 public:
     ArchetypeGraph();
     std::vector<Archetype *> getCompatibleArchetypes(ArchetypeSignature signature);
     void createEntity(EntityId id, ArchetypeSignature signature);
     template <typename T>
-    void addComponent(EntityId id, T *component, ArchetypeSignature &signature);
+    std::map<ComponentId, std::shared_ptr<Component>> addComponent(EntityId id, T *component, ArchetypeSignature &signature);
 };
 
 template <typename T>
-inline void ArchetypeGraph::addComponent(EntityId id, T *component, ArchetypeSignature &signature)
+inline std::map<ComponentId, std::shared_ptr<Component>> ArchetypeGraph::addComponent(EntityId id, T *component, ArchetypeSignature &signature)
 {
-    addComponent(id, ComponentManager::getId<T>(), component, signature);
+    return addComponent(id, ComponentManager::getId<T>(), component, signature);
 }
 
 #endif // ARCHETYPEGRAPH_H_INCLUDED

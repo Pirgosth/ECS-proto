@@ -1,14 +1,10 @@
 #include "AnimatedSpriteSystem.hpp"
 
-void AnimatedSpriteSystem::init(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> entities)
+void AnimatedSpriteSystem::init(EntityId entityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>> components)
 {
-    for (auto [entityId, components] : entities)
-    {
-        auto [transform, animatedSprite] = components;
-        auto activeSprite = getOrCreateSprite(entityId, *animatedSprite);
-
-        activeSprite->sprite.setPosition(transform->m_position);
-    }
+    auto [transform, animatedSprite] = components;
+    auto activeSprite = getOrCreateSprite(entityId, *animatedSprite);
+    activeSprite->sprite.setPosition(transform->m_position);
 }
 
 void AnimatedSpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> entities)
@@ -16,7 +12,7 @@ void AnimatedSpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<
     for (auto [entityId, components] : entities)
     {
         auto [transform, animatedSprite] = components;
-        auto activeSprite = getOrCreateSprite(entityId, *animatedSprite);
+        auto activeSprite = getSprite(entityId, *animatedSprite);
 
         if (activeSprite->clock.getElapsedTime().asMilliseconds() >= (1000.0f / animatedSprite->m_ips))
         {
@@ -25,6 +21,7 @@ void AnimatedSpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<
             activeSprite->clock.restart();
         }
 
+        activeSprite->sprite.setPosition(transform->m_position);
         m_window.draw(activeSprite->sprite);
     }
 }
@@ -39,6 +36,11 @@ std::shared_ptr<ActiveSprite> AnimatedSpriteSystem::getOrCreateSprite(EntityId i
         m_activeSprites.emplace(id, std::make_shared<ActiveSprite>(sprite));
     }
 
+    return m_activeSprites.at(id);
+}
+
+std::shared_ptr<ActiveSprite> AnimatedSpriteSystem::getSprite(EntityId id, AnimatedSprite &animatedSprite)
+{
     return m_activeSprites.at(id);
 }
 

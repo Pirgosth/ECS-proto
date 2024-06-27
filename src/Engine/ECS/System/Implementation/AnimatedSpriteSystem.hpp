@@ -25,9 +25,10 @@ class AnimatedSpriteSystem : public System<Transform, AnimatedSprite>
 private:
     sf::RenderWindow &m_window;
     std::unordered_map<EntityId, std::shared_ptr<ActiveSprite>> m_activeSprites;
-    virtual void init(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> entities) override;
+    virtual void init(EntityId entityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>> components) override;
     virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> entities) override;
     std::shared_ptr<ActiveSprite> getOrCreateSprite(EntityId id, AnimatedSprite &animatedSprite);
+    std::shared_ptr<ActiveSprite> getSprite(EntityId id, AnimatedSprite &animatedSprite);
 public:
     AnimatedSpriteSystem(sf::RenderWindow &window);
 };

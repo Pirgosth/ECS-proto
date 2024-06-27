@@ -26,12 +26,12 @@ private:
     static std::tuple<std::shared_ptr<Components>...> parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> rawComponents);
 
     ArchetypeSignature m_componentsIds;
-    virtual void notifyInit(std::vector<Archetype *> archetypes) override;
+    virtual void notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &components) override;
     virtual void notifyUpdate(std::vector<Archetype *> archetypes) override;
     virtual ArchetypeSignature getSignature() const override;
 
 protected:
-    virtual void init(std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entities);
+    virtual void init(EntityId entityId, std::tuple<std::shared_ptr<Components>...> components);
     virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entities) = 0;
     template <typename T>
     static std::shared_ptr<T> getComponent(std::tuple<std::shared_ptr<Components>...> components);
@@ -70,15 +70,10 @@ inline std::tuple<std::shared_ptr<Components>...> System<Components...>::parseRa
 }
 
 template <typename... Components>
-inline void System<Components...>::notifyInit(std::vector<Archetype *> archetypes)
+inline void System<Components...>::notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &rawComponents)
 {
-    std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entites;
-    for (auto archetype : archetypes)
-    {
-        for (auto [entityId, rawComponents] : archetype->getEntities())
-            entites.emplace(entityId, parseRawComponents(rawComponents));
-    }
-    init(entites);
+    std::tuple<std::shared_ptr<Components>...> components = parseRawComponents(rawComponents);
+    init(entityId, components);
 }
 
 template <typename... Components>
@@ -107,7 +102,7 @@ inline ArchetypeSignature System<Components...>::getSignature() const
 }
 
 template <typename... Components>
-inline void System<Components...>::init(std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entities) {}
+inline void System<Components...>::init(EntityId entityId, std::tuple<std::shared_ptr<Components>...> components) {}
 
 template <typename... Components>
 template <typename T>

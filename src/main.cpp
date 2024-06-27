@@ -28,10 +28,15 @@ int main()
     }
 
     auto testEntity = engine.makeEntity();
-    engine.addComponent(testEntity, new Transform(sf::Vector2f(0, 0)));
+    auto transformComponent = new Transform(sf::Vector2f(0, 0));
+    engine.addComponent(testEntity, transformComponent);
     engine.addComponent(testEntity, new AnimatedSprite("assets/spritesheets/green.json", 6));
 
     bool isRunning = true;
+
+    transformComponent->setPosition(sf::Vector2f(500, 0));
+
+    sf::Clock delta;
 
     while (isRunning)
     {
@@ -43,7 +48,11 @@ int main()
         }
 
         window.clear();
+
+        delta.restart();
         engine.update();
+        const auto fps = delta.getElapsedTime().asMicroseconds() / 1000.0f;
+        std::cout << "Engine time: " << fps << "ms" << std::endl;
         window.display();
     }
 

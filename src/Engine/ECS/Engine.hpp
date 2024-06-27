@@ -35,12 +35,12 @@ inline void Engine::addComponent(EntityId id, T *component)
         return;
 
     auto& signature = m_entitiesSignatures.at(id);
-    m_archetypeGraph.addComponent(id, component, signature);
+    auto rawComponents = m_archetypeGraph.addComponent(id, component, signature);
 
     for (auto system: m_systems)
     {
         if (system->getSignature() == signature)
-            system->notifyInit(m_archetypeGraph.getCompatibleArchetypes(signature));
+            system->notifyInit(id, rawComponents);
     }
 }
 

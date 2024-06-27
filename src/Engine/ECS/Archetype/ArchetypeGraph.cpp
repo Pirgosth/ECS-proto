@@ -26,7 +26,7 @@ void ArchetypeGraph::createEntity(EntityId id, ArchetypeSignature signature)
     archetype.addEntity(id, std::map<EntityId, std::shared_ptr<Component>>());
 }
 
-void ArchetypeGraph::addComponent(EntityId id, ComponentId componentId, Component *component, ArchetypeSignature &signature)
+std::map<ComponentId, std::shared_ptr<Component>> ArchetypeGraph::addComponent(EntityId id, ComponentId componentId, Component *component, ArchetypeSignature &signature)
 {
     std::map<ComponentId, std::shared_ptr<Component>> components;
 
@@ -51,4 +51,5 @@ void ArchetypeGraph::addComponent(EntityId id, ComponentId componentId, Componen
         archetypeNodes.emplace(newArchetypeNode);
     }
     newArchetypeNode->m_archetype.addEntity(id, components);
+    return components;
 }
