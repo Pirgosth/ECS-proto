@@ -19,12 +19,15 @@ int main()
     engine.registerSystem(new SpriteSystem(window));
     engine.registerSystem(new AnimatedSpriteSystem(window));
 
-    for (int i = 0; i < 12; i++)
+    for (int j = 0; j < 10; j++)
     {
-        auto sprite = engine.makeEntity();
+        for (int i = 0; i < 200; i++)
+        {
+            auto sprite = engine.makeEntity();
 
-        engine.addComponent(sprite, new Transform(sf::Vector2f(50 + 40 * i, 300)));
-        engine.addComponent(sprite, new AnimatedSprite("assets/spritesheets/green.json", 6));
+            engine.addComponent(sprite, new Transform(sf::Vector2f(50 + 40 * i, 300 + (32 + 10) * j)));
+            engine.addComponent(sprite, new AnimatedSprite("assets/spritesheets/green.json", 6));
+        }
     }
 
     auto testEntity = engine.makeEntity();

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <memory>
+#include <unordered_map>
 #include <tuple>
 #include <vector>
 
@@ -22,8 +23,8 @@ private:
     template <typename First, typename Second, typename... Args>
     static ArchetypeSignature computeSignature();
     template <typename T>
-    static std::shared_ptr<T> parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> rawComponents);
-    static std::tuple<std::shared_ptr<Components>...> parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> rawComponents);
+    static std::shared_ptr<T> parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> &rawComponents);
+    static std::tuple<std::shared_ptr<Components>...> parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> &rawComponents);
 
     ArchetypeSignature m_componentsIds;
     virtual void notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &components) override;
@@ -32,7 +33,7 @@ private:
 
 protected:
     virtual void init(EntityId entityId, std::tuple<std::shared_ptr<Components>...> components);
-    virtual void update(std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entities) = 0;
+    virtual void update(std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> &entities) = 0;
     template <typename T>
     static std::shared_ptr<T> getComponent(std::tuple<std::shared_ptr<Components>...> components);
 
@@ -56,7 +57,7 @@ ArchetypeSignature System<Components...>::computeSignature()
 
 template <typename... Components>
 template <typename T>
-inline std::shared_ptr<T> System<Components...>::parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> rawComponents)
+inline std::shared_ptr<T> System<Components...>::parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> &rawComponents)
 {
     assert(rawComponents.count(ComponentManager::getId<T>()) != 0 && "Invalid entities provided to this system");
     std::shared_ptr<Component> t = rawComponents.at(ComponentManager::getId<T>());
@@ -64,7 +65,7 @@ inline std::shared_ptr<T> System<Components...>::parseRawComponent(std::map<Comp
 }
 
 template <typename... Components>
-inline std::tuple<std::shared_ptr<Components>...> System<Components...>::parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> rawComponents)
+inline std::tuple<std::shared_ptr<Components>...> System<Components...>::parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> &rawComponents)
 {
     return std::make_tuple(parseRawComponent<Components>(rawComponents)...);
 }
@@ -79,7 +80,7 @@ inline void System<Components...>::notifyInit(EntityId entityId, std::map<Compon
 template <typename... Components>
 inline void System<Components...>::notifyUpdate(std::vector<Archetype *> archetypes)
 {
-    std::map<EntityId, std::tuple<std::shared_ptr<Components>...>> entites;
+    std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> entites;
     for (auto archetype : archetypes)
     {
         for (auto [entityId, rawComponents] : archetype->getEntities())

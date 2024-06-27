@@ -7,7 +7,7 @@ void AnimatedSpriteSystem::init(EntityId entityId, std::tuple<std::shared_ptr<Tr
     activeSprite->sprite.setPosition(transform->m_position);
 }
 
-void AnimatedSpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> entities)
+void AnimatedSpriteSystem::update(std::unordered_map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> &entities)
 {
     for (auto [entityId, components] : entities)
     {

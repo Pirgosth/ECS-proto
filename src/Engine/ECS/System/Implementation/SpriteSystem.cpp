@@ -1,6 +1,6 @@
 #include "SpriteSystem.hpp"
 
-void SpriteSystem::update(std::map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<Sprite>>> entities)
+void SpriteSystem::update(std::unordered_map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<Sprite>>> &entities)
 {
     for (auto [_, components] : entities)
     {
