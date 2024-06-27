@@ -1,20 +1,39 @@
 #include "AnimatedSprite.hpp"
 
 TextureManager AnimatedSprite::g_textureManager;
+std::unordered_map<std::string, std::shared_ptr<SpritesheetRecord>> AnimatedSprite::g_spritesheetCache;
 
-AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips): m_ips(ips)
+const std::shared_ptr<SpritesheetRecord> AnimatedSprite::getOrLoadSpritesheet(std::string path)
 {
-    std::ifstream jsonFile(spritesheetPath);
-    json jsonSpriteSheet = json::parse(jsonFile);
+    SpritesheetRecord record;
 
-    std::string spritePath = jsonSpriteSheet["path"];
-    m_spritesheetTexture = *g_textureManager.getOrCreateTexture(spritePath);
+    if (g_spritesheetCache.count(path) == 0)
+    {
+        std::ifstream jsonFile(path);
+        json jsonSpriteSheet = json::parse(jsonFile);
 
-    json sprites = jsonSpriteSheet["sprites"];
-    for (auto& it : sprites.items()) {
-        std::vector<int> jsonSpriteRect = it.value().get<std::vector<int>>();
-        if (jsonSpriteRect.size() != 4)
-            continue;
-        m_spritesheet.push_back({jsonSpriteRect[0], jsonSpriteRect[1], jsonSpriteRect[2], jsonSpriteRect[3]});
+        std::string spritePath = jsonSpriteSheet["path"];
+        json sprites = jsonSpriteSheet["sprites"];
+
+        record.path = spritePath;
+
+        for (auto &it : sprites.items())
+        {
+            std::vector<int> jsonSpriteRect = it.value().get<std::vector<int>>();
+            if (jsonSpriteRect.size() != 4)
+                continue;
+            record.sprites.push_back({jsonSpriteRect[0], jsonSpriteRect[1], jsonSpriteRect[2], jsonSpriteRect[3]});
+        }
+
+        g_spritesheetCache.emplace(path, std::make_shared<SpritesheetRecord>(record));
     }
+
+    return g_spritesheetCache.at(path);
+}
+
+AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_ips(ips)
+{
+    auto jsonSpriteSheet = getOrLoadSpritesheet(spritesheetPath);
+    m_spritesheetTexture = g_textureManager.getOrCreateTexture(jsonSpriteSheet->path);
+    m_spritesheet = &jsonSpriteSheet->sprites;
 }

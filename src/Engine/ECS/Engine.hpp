@@ -40,7 +40,10 @@ inline void Engine::addComponent(EntityId id, T *component)
     for (auto system: m_systems)
     {
         if (system->getSignature() == signature)
+        {
+            system->updateEntity(id, rawComponents);
             system->notifyInit(id, rawComponents);
+        }
     }
 }
 

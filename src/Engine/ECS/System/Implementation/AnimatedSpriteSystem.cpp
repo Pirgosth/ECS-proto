@@ -7,7 +7,7 @@ void AnimatedSpriteSystem::init(EntityId entityId, std::tuple<std::shared_ptr<Tr
     activeSprite->sprite.setPosition(transform->m_position);
 }
 
-void AnimatedSpriteSystem::update(std::unordered_map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> &entities)
+void AnimatedSpriteSystem::update(std::unordered_map <EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> &entities)
 {
     for (auto [entityId, components] : entities)
     {
@@ -16,8 +16,8 @@ void AnimatedSpriteSystem::update(std::unordered_map<EntityId, std::tuple<std::s
 
         if (activeSprite->clock.getElapsedTime().asMilliseconds() >= (1000.0f / animatedSprite->m_ips))
         {
-            activeSprite->currentIndex = (activeSprite->currentIndex + 1) % animatedSprite->m_spritesheet.size();
-            activeSprite->sprite.setTextureRect(animatedSprite->m_spritesheet[activeSprite->currentIndex]);
+            activeSprite->currentIndex = (activeSprite->currentIndex + 1) % (*animatedSprite->m_spritesheet).size();
+            activeSprite->sprite.setTextureRect((*animatedSprite->m_spritesheet)[activeSprite->currentIndex]);
             activeSprite->clock.restart();
         }
 
@@ -31,8 +31,8 @@ std::shared_ptr<ActiveSprite> AnimatedSpriteSystem::getOrCreateSprite(EntityId i
     if (m_activeSprites.count(id) == 0)
     {
         sf::Sprite sprite;
-        sprite.setTexture(animatedSprite.m_spritesheetTexture);
-        sprite.setTextureRect(animatedSprite.m_spritesheet[0]);
+        sprite.setTexture(*animatedSprite.m_spritesheetTexture);
+        sprite.setTextureRect((*animatedSprite.m_spritesheet)[0]);
         m_activeSprites.emplace(id, std::make_shared<ActiveSprite>(sprite));
     }
 

@@ -25,10 +25,12 @@ private:
     template <typename T>
     static std::shared_ptr<T> parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> &rawComponents);
     static std::tuple<std::shared_ptr<Components>...> parseRawComponents(std::map<ComponentId, std::shared_ptr<Component>> &rawComponents);
+    std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> m_entitiesCacheMap;
 
     ArchetypeSignature m_componentsIds;
     virtual void notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &components) override;
-    virtual void notifyUpdate(std::vector<Archetype *> archetypes) override;
+    virtual void notifyUpdate() override;
+    virtual void updateEntity(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> components) override;
     virtual ArchetypeSignature getSignature() const override;
 
 protected:
@@ -78,16 +80,18 @@ inline void System<Components...>::notifyInit(EntityId entityId, std::map<Compon
 }
 
 template <typename... Components>
-inline void System<Components...>::notifyUpdate(std::vector<Archetype *> archetypes)
+inline void System<Components...>::notifyUpdate()
 {
-    std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> entites;
-    for (auto archetype : archetypes)
-    {
-        for (auto [entityId, rawComponents] : archetype->getEntities())
-            entites.emplace(entityId, parseRawComponents(rawComponents));
-    }
-    update(entites);
+    update(m_entitiesCacheMap);
+}
 
+template <typename... Components>
+inline void System<Components...>::updateEntity(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> components)
+{
+    if (m_entitiesCacheMap.count(entityId) == 0)
+    {
+        m_entitiesCacheMap.emplace(entityId, parseRawComponents(components));
+    }
 }
 
 template <typename... Components>

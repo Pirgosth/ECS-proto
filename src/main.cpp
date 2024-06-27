@@ -10,6 +10,11 @@
 
 #include "Engine/ECS/System/MonoSystem.hpp"
 
+class DummyComponent: public Component
+{
+
+};
+
 int main()
 {
     Engine engine;
@@ -21,7 +26,7 @@ int main()
 
     for (int j = 0; j < 10; j++)
     {
-        for (int i = 0; i < 200; i++)
+        for (int i = 0; i < 20; i++)
         {
             auto sprite = engine.makeEntity();
 

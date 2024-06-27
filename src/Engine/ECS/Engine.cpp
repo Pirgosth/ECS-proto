@@ -6,8 +6,7 @@ void Engine::update()
 {
     for (auto system: m_systems)
     {
-        ArchetypeSignature signature = system->getSignature();
-        system->notifyUpdate(m_archetypeGraph.getCompatibleArchetypes(signature));
+        system->notifyUpdate();
     }
 }
 
@@ -28,5 +27,6 @@ EntityId Engine::makeEntity()
     auto signature = m_entitiesSignatures.at(id);
 
     m_archetypeGraph.createEntity(id, signature);
+
     return id;
 }
