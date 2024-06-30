@@ -36,11 +36,12 @@ int main()
     }
 
     auto testEntity = engine.makeEntity();
-    auto transformComponent = new Transform(sf::Vector2f(0, 0));
-    engine.addComponent(testEntity, transformComponent);
+    engine.addComponent(testEntity, new Transform(sf::Vector2f(0, 0)));
     engine.addComponent(testEntity, new AnimatedSprite("assets/spritesheets/green.json", 6));
 
     bool isRunning = true;
+
+    auto transformComponent = engine.getComponent<Transform>(testEntity);
 
     transformComponent->setPosition(sf::Vector2f(500, 0));
 

@@ -24,12 +24,31 @@ public:
     void createEntity(EntityId id, ArchetypeSignature signature);
     template <typename T>
     std::map<ComponentId, std::shared_ptr<Component>> addComponent(EntityId id, T *component, ArchetypeSignature &signature);
+    template <typename T>
+    std::shared_ptr<T> getComponent(EntityId id);
 };
 
 template <typename T>
 inline std::map<ComponentId, std::shared_ptr<Component>> ArchetypeGraph::addComponent(EntityId id, T *component, ArchetypeSignature &signature)
 {
     return addComponent(id, ComponentManager::getId<T>(), component, signature);
+}
+
+template <typename T>
+inline std::shared_ptr<T> ArchetypeGraph::getComponent(EntityId id)
+{
+    ComponentId componentId = ComponentManager::getId<T>();
+    
+    if (m_componentArchetypes.count(componentId) == 0)
+        return nullptr;
+    
+    for (auto archetypeNode: m_componentArchetypes.at(componentId))
+    {
+        if (archetypeNode->m_archetype.doesContainsEntity(id))
+            return std::static_pointer_cast<T>(archetypeNode->m_archetype.getComponents(id).at(componentId));
+    }
+
+    return nullptr;    
 }
 
 #endif // ARCHETYPEGRAPH_H_INCLUDED

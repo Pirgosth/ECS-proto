@@ -24,7 +24,9 @@ public:
     void registerSystem(BaseSystem *system);
     EntityId makeEntity();
     template <typename T>
-    void addComponent(EntityId, T *component);
+    void addComponent(EntityId id, T *component);
+    template <typename T>
+    std::shared_ptr<T> getComponent(EntityId id);
 };
 
 template <typename T>
@@ -45,6 +47,12 @@ inline void Engine::addComponent(EntityId id, T *component)
             system->notifyInit(id, rawComponents);
         }
     }
+}
+
+template <typename T>
+inline std::shared_ptr<T> Engine::getComponent(EntityId id)
+{
+    return m_archetypeGraph.getComponent<T>(id);
 }
 
 #endif // ENGINE_H_INCLUDED
