@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include <SFML/Graphics.hpp>
+
 #include "Engine/ECS/Archetype/ArchetypeGraph.hpp"
 #include "Engine/ECS/Component/Component.hpp"
 #include "Engine/ECS/ComponentManager.hpp"
@@ -41,7 +43,7 @@ inline void Engine::addComponent(EntityId id, T *component)
 
     for (auto system: m_systems)
     {
-        if (system->getSignature() == signature)
+        if (system->canHandle(signature))
         {
             system->updateEntity(id, rawComponents);
             system->notifyInit(id, rawComponents);

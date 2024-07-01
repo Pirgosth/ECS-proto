@@ -17,9 +17,11 @@ class BaseSystem
 
 protected:
     virtual void notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &components) = 0;
-    virtual void notifyUpdate() = 0;
+    virtual void notifyUpdate(const float &deltaTime) = 0;
     virtual void updateEntity(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> components) = 0;
     virtual ArchetypeSignature getSignature() const = 0;
+public:
+    bool canHandle(ArchetypeSignature signature);
 };
 
 #endif // BASESYSTEM_H_INCLUDED

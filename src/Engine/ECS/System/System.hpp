@@ -29,13 +29,13 @@ private:
 
     ArchetypeSignature m_componentsIds;
     virtual void notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &components) override;
-    virtual void notifyUpdate() override;
+    virtual void notifyUpdate(const float &deltaTime) override;
     virtual void updateEntity(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> components) override;
     virtual ArchetypeSignature getSignature() const override;
 
 protected:
     virtual void init(EntityId entityId, std::tuple<std::shared_ptr<Components>...> components);
-    virtual void update(std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> &entities) = 0;
+    virtual void update(const float &deltaTime, std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> &entities) = 0;
     template <typename T>
     static std::shared_ptr<T> getComponent(std::tuple<std::shared_ptr<Components>...> components);
 
@@ -80,9 +80,9 @@ inline void System<Components...>::notifyInit(EntityId entityId, std::map<Compon
 }
 
 template <typename... Components>
-inline void System<Components...>::notifyUpdate()
+inline void System<Components...>::notifyUpdate(const float &deltaTime)
 {
-    update(m_entitiesCacheMap);
+    update(deltaTime, m_entitiesCacheMap);
 }
 
 template <typename... Components>

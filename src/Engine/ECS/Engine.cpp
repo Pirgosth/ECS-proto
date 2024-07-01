@@ -4,9 +4,11 @@ EntityId Engine::g_EntitiesCount = 0;
 
 void Engine::update()
 {
+    static sf::Clock m_deltaTimeClock;
+    const float deltaTime = m_deltaTimeClock.restart().asMicroseconds() / 1000000.0f;
     for (auto system: m_systems)
     {
-        system->notifyUpdate();
+        system->notifyUpdate(deltaTime);
     }
 }
 

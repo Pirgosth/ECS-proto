@@ -6,9 +6,8 @@
 #include "Engine/ECS/Engine.hpp"
 #include "Engine/ECS/System/Implementation/SpriteSystem.hpp"
 #include "Engine/ECS/System/Implementation/AnimatedSpriteSystem.hpp"
-#include "Engine/ECS/Component/AnimatedSprite.hpp"
-
-#include "Engine/ECS/System/MonoSystem.hpp"
+#include "Engine/ECS/System/Implementation/BasicCollisionSystem.hpp"
+#include "Engine/ECS/System/Implementation/GravitySystem.hpp"
 
 class DummyComponent: public Component
 {
@@ -23,27 +22,18 @@ int main()
 
     engine.registerSystem(new SpriteSystem(window));
     engine.registerSystem(new AnimatedSpriteSystem(window));
+    engine.registerSystem(new BasicCollisionSystem());
+    engine.registerSystem(new GravitySystem());
 
-    for (int j = 0; j < 10; j++)
+    for (int i = 0; i < 27; i++)
     {
-        for (int i = 0; i < 20; i++)
-        {
-            auto sprite = engine.makeEntity();
-
-            engine.addComponent(sprite, new Transform(sf::Vector2f(50 + 40 * i, 300 + (32 + 10) * j)));
-            engine.addComponent(sprite, new AnimatedSprite("assets/spritesheets/green.json", 6));
-        }
+        auto testEntity = engine.makeEntity();
+        engine.addComponent(testEntity, new Transform(sf::Vector2f(100 + 40 * i, 150 - 10 * i)));
+        engine.addComponent(testEntity, new AnimatedSprite("assets/spritesheets/green.json", 6));
+        engine.addComponent(testEntity, new Body());
     }
 
-    auto testEntity = engine.makeEntity();
-    engine.addComponent(testEntity, new Transform(sf::Vector2f(0, 0)));
-    engine.addComponent(testEntity, new AnimatedSprite("assets/spritesheets/green.json", 6));
-
     bool isRunning = true;
-
-    auto transformComponent = engine.getComponent<Transform>(testEntity);
-
-    transformComponent->setPosition(sf::Vector2f(500, 0));
 
     sf::Clock delta;
 

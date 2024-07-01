@@ -10,60 +10,29 @@
 #include "Engine/ECS/Component/Component.hpp"
 #include "Engine/ECS/ComponentManager.hpp"
 #include "Engine/ECS/Types.hpp"
-#include "Engine/ECS/System/BaseSystem.hpp"
+#include "Engine/ECS/System/System.hpp"
+
+//TODO: Complete rework or abandon of this class
 
 template <typename SingleComponent>
-class MonoSystem : public BaseSystem
+class MonoSystem : public System<SingleComponent>
 {
-private:
-    static ArchetypeSignature computeSignature();
-
-    ArchetypeSignature m_componentsIds;
-    virtual void notifyUpdate(std::vector<Archetype *> archetypes) override;
-    virtual ArchetypeSignature getSignature() const override;
-    std::shared_ptr<SingleComponent> parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> rawComponents);
-
 protected:
+    virtual void update(const float &deltaTime, std::unordered_map<EntityId, std::tuple<std::shared_ptr<SingleComponent>>> &entities) override;
     virtual void update(std::map<EntityId, std::shared_ptr<SingleComponent>> entities) = 0;
-
-public:
-    MonoSystem();
 };
 
-template <typename SingleComponent>
-inline ArchetypeSignature MonoSystem<SingleComponent>::computeSignature()
-{
-    return {ComponentManager::getId<SingleComponent>()};
-}
 
 template <typename SingleComponent>
-inline void MonoSystem<SingleComponent>::notifyUpdate(std::vector<Archetype *> archetypes)
+inline void MonoSystem<SingleComponent>::update(const float &deltaTime, std::unordered_map<EntityId, std::tuple<std::shared_ptr<SingleComponent>>> &entities)
 {
-    std::map<EntityId, std::shared_ptr<SingleComponent>> entites;
-    for (auto archetype : archetypes)
+    std::map<EntityId, std::shared_ptr<SingleComponent>> monoEntities;
+    for (auto [id, components]: entities)
     {
-        for (auto [entityId, rawComponents] : archetype->getEntities())
-            entites.emplace(entityId, parseRawComponent(rawComponents));
+        auto [component] = components;
+        monoEntities.emplace(id, component);
     }
-    update(entites);
-}
-
-template <typename SingleComponent>
-inline ArchetypeSignature MonoSystem<SingleComponent>::getSignature() const
-{
-    return m_componentsIds;
-}
-
-template <typename SingleComponent>
-inline std::shared_ptr<SingleComponent> MonoSystem<SingleComponent>::parseRawComponent(std::map<ComponentId, std::shared_ptr<Component>> rawComponents)
-{
-    std::shared_ptr<Component> t = rawComponents.at(ComponentManager::getId<SingleComponent>());
-    return std::static_pointer_cast<SingleComponent>(t);
-}
-
-template <typename SingleComponent>
-inline MonoSystem<SingleComponent>::MonoSystem(): m_componentsIds(computeSignature())
-{
+    update(deltaTime, monoEntities);
 }
 
 #endif // MONOSYSTEM_H_INCLUDED
