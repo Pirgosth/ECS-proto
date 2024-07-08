@@ -14,6 +14,8 @@
 #include "Engine/ECS/Types.hpp"
 #include "Engine/ECS/System/BaseSystem.hpp"
 
+#include <SFML/Graphics.hpp>
+
 template <typename... Components>
 class System : public BaseSystem
 {
@@ -30,12 +32,14 @@ private:
     ArchetypeSignature m_componentsIds;
     virtual void notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &components) override;
     virtual void notifyUpdate(const float &deltaTime) override;
+    virtual void notifyDraw(const sf::RenderWindow &window) override;
     virtual void updateEntity(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> components) override;
     virtual ArchetypeSignature getSignature() const override;
 
 protected:
     virtual void init(EntityId entityId, std::tuple<std::shared_ptr<Components>...> components);
     virtual void update(const float &deltaTime, std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> &entities) = 0;
+    virtual void draw(const sf::RenderWindow &window, std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> &entities);
     template <typename T>
     static std::shared_ptr<T> getComponent(std::tuple<std::shared_ptr<Components>...> components);
 
@@ -86,6 +90,12 @@ inline void System<Components...>::notifyUpdate(const float &deltaTime)
 }
 
 template <typename... Components>
+inline void System<Components...>::notifyDraw(const sf::RenderWindow &window)
+{
+    draw(window, m_entitiesCacheMap);
+}
+
+template <typename... Components>
 inline void System<Components...>::updateEntity(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> components)
 {
     if (m_entitiesCacheMap.count(entityId) == 0)
@@ -108,6 +118,9 @@ inline ArchetypeSignature System<Components...>::getSignature() const
 
 template <typename... Components>
 inline void System<Components...>::init(EntityId entityId, std::tuple<std::shared_ptr<Components>...> components) {}
+
+template <typename... Components>
+inline void System<Components...>::draw(const sf::RenderWindow &window, std::unordered_map<EntityId, std::tuple<std::shared_ptr<Components>...>> &entities) {}
 
 template <typename... Components>
 template <typename T>

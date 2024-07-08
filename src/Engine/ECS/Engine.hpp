@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include <SFML/Graphics.hpp>
@@ -17,12 +18,19 @@ class Engine
 private:
     static EntityId g_EntitiesCount;
 
+    bool m_isRunning;
     ArchetypeGraph m_archetypeGraph;
     std::unordered_map<EntityId, ArchetypeSignature> m_entitiesSignatures;
     std::vector<std::shared_ptr<BaseSystem>> m_systems;
+    std::thread m_updateThread;
 
 public:
+    Engine();
+    void start();
     void update();
+    void stop();
+    bool isRunning();
+    void draw(sf::RenderWindow &window);
     void registerSystem(BaseSystem *system);
     EntityId makeEntity();
     template <typename T>
@@ -38,10 +46,10 @@ inline void Engine::addComponent(EntityId id, T *component)
     if (m_entitiesSignatures.count(id) == 0)
         return;
 
-    auto& signature = m_entitiesSignatures.at(id);
+    auto &signature = m_entitiesSignatures.at(id);
     auto rawComponents = m_archetypeGraph.addComponent(id, component, signature);
 
-    for (auto system: m_systems)
+    for (auto system : m_systems)
     {
         if (system->canHandle(signature))
         {

@@ -10,4 +10,9 @@ void SpriteSystem::update(const float &deltaTime, std::unordered_map<EntityId, s
     }
 }
 
+void SpriteSystem::draw(const sf::RenderWindow &window, std::unordered_map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<Sprite>>> &entities)
+{
+    
+}
+
 SpriteSystem::SpriteSystem(sf::RenderWindow &window): m_window(window) {}

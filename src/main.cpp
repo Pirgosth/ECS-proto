@@ -9,9 +9,8 @@
 #include "Engine/ECS/System/Implementation/BasicCollisionSystem.hpp"
 #include "Engine/ECS/System/Implementation/GravitySystem.hpp"
 
-class DummyComponent: public Component
+class DummyComponent : public Component
 {
-
 };
 
 int main()
@@ -33,25 +32,19 @@ int main()
         engine.addComponent(testEntity, new Body());
     }
 
-    bool isRunning = true;
+    engine.start();
 
-    sf::Clock delta;
-
-    while (isRunning)
+    while (engine.isRunning())
     {
         sf::Event event;
         while (window.pollEvent(event))
-        {
+        {  
             if (event.type == sf::Event::Closed)
-                isRunning = false;
+                engine.stop();
         }
 
         window.clear();
-
-        delta.restart();
-        engine.update();
-        const auto fps = delta.getElapsedTime().asMicroseconds() / 1000.0f;
-        std::cout << "Engine time: " << fps << "ms" << std::endl;
+        engine.draw(window);
         window.display();
     }
 

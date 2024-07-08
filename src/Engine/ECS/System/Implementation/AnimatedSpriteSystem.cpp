@@ -22,6 +22,15 @@ void AnimatedSpriteSystem::update(const float &deltaTime, std::unordered_map <En
         }
 
         activeSprite->sprite.setPosition(transform->m_position);
+    }
+}
+
+void AnimatedSpriteSystem::draw(const sf::RenderWindow &window, std::unordered_map<EntityId, std::tuple<std::shared_ptr<Transform>, std::shared_ptr<AnimatedSprite>>> &entities)
+{
+    for (auto [entityId, components] : entities)
+    {
+        auto [transform, animatedSprite] = components;
+        auto activeSprite = getSprite(entityId, *animatedSprite);
         m_window.draw(activeSprite->sprite);
     }
 }

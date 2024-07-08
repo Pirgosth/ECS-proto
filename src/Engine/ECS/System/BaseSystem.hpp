@@ -9,6 +9,8 @@
 #include "Engine/ECS/Archetype/Archetype.hpp"
 #include "Engine/ECS/Types.hpp"
 
+#include <SFML/Graphics.hpp>
+
 class Engine;
 
 class BaseSystem
@@ -19,6 +21,7 @@ protected:
     virtual void notifyInit(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> &components) = 0;
     virtual void notifyUpdate(const float &deltaTime) = 0;
     virtual void updateEntity(EntityId entityId, std::map<ComponentId, std::shared_ptr<Component>> components) = 0;
+    virtual void notifyDraw(const sf::RenderWindow &window) = 0;
     virtual ArchetypeSignature getSignature() const = 0;
 public:
     bool canHandle(ArchetypeSignature signature);
