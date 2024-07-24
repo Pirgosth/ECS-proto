@@ -1,0 +1,142 @@
+#ifndef ARCHETYPE_H_INCLUDED
+#define ARCHETYPE_H_INCLUDED
+
+#include <memory>
+#include <iostream>
+#include <iterator>
+#include <tuple>
+#include <vector>
+
+template <typename... Components>
+class Archetype;
+
+template <typename... Components>
+class Archetype : public Archetype<Components>...
+{
+    class iterator : public std::iterator<
+                         std::input_iterator_tag,  // iterator_category
+                         std::tuple<Components...> // value_type
+                         >
+    {
+
+    private:
+        std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> currentIt;
+        std::tuple<Components...> current;
+
+        template <typename T>
+        void incrementComponentIterator(std::shared_ptr<typename std::vector<T>::iterator> &value)
+        {
+            ++(*value);
+        }
+
+        void incrementComponentIterator(std::shared_ptr<typename std::vector<Components>::iterator>... components)
+        {
+            (incrementComponentIterator<Components>(components), ...);
+            current = retrieveValues();
+        }
+
+        template <typename T>
+        T retrieveValue(std::shared_ptr<typename std::vector<T>::iterator> value)
+        {
+            return *(*value);
+        }
+
+        std::tuple<Components...> retrieveValues()
+        {
+            return std::make_tuple(retrieveValue<Components>(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(currentIt))...);
+        }
+
+        template <typename First, typename... Tail>
+        bool equals(iterator other) const
+        {
+            return *(std::get<0>(currentIt)) == *(std::get<0>(other.currentIt));
+        }
+
+    public:
+        explicit iterator(std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> _current) : currentIt(_current)
+        {
+            current = retrieveValues();
+        }
+        iterator &operator++()
+        {
+            incrementComponentIterator(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(currentIt)...);
+            return *this;
+        }
+        iterator operator++(int)
+        {
+            iterator retval = *this;
+            ++(*this);
+            return retval;
+        }
+        bool operator==(iterator other) const { return equals<Components...>(other); }
+        bool operator!=(iterator other) const { return !(*this == other); }
+        std::tuple<Components...> &operator*() { return current; }
+    };
+
+private:
+    template <typename T>
+    std::shared_ptr<typename std::vector<T>::iterator> getBegin()
+    {
+        auto beg = Archetype<T>::m_components.begin();
+        return std::make_shared<typename std::vector<T>::iterator>(beg);
+    }
+
+    std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> getBegin()
+    {
+        auto tuple = std::make_tuple(getBegin<Components>()...);
+        return tuple;
+    }
+
+    template <typename T>
+    std::shared_ptr<typename std::vector<T>::iterator> getEnd()
+    {
+        auto end = Archetype<T>::m_components.end();
+        return std::make_shared<typename std::vector<T>::iterator>(end);
+    }
+
+    std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> getEnd()
+    {
+        return std::make_tuple(getEnd<Components>()...);
+    }
+
+public:
+    template <typename T>
+    std::vector<T> &getComponents();
+
+    std::vector<std::tuple<Components...>> getEntities();
+
+    iterator begin() { return iterator(getBegin()); }
+    iterator end() { return iterator(getEnd()); }
+};
+
+template <typename T>
+class Archetype<T>
+{
+protected:
+    std::vector<T> m_components;
+public:
+    std::vector<T> &getComponents();
+    typename std::vector<T>::iterator begin() { return m_components.begin(); }
+    typename std::vector<T>::iterator end() { return m_components.end(); }
+};
+
+template <typename... Components>
+template <typename T>
+inline std::vector<T> &Archetype<Components...>::getComponents()
+{
+    return Archetype<T>::getComponents();
+}
+
+template <typename T>
+inline std::vector<T> &Archetype<T>::getComponents()
+{
+    return m_components;
+}
+
+template <typename... Components>
+inline std::vector<std::tuple<Components...>> Archetype<Components...>::getEntities()
+{
+    return std::vector<std::tuple<Components...>>();
+}
+
+#endif // ARCHETYPE_H_INCLUDED
