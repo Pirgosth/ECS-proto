@@ -1,10 +1,10 @@
-#include <algorithm>
 #include <iostream>
 
-#include "Archetype.hpp"
-#include "ArchetypeGraph.hpp"
-#include "TypeId.hpp"
-#include "HeterogeneousContainer.hpp"
+#include <SFML/Graphics.hpp>
+
+#include "ECS.hpp"
+#include "System.hpp"
+#include "Systems/AnimatedSpriteSystem.hpp"
 
 // int main()
 // {
@@ -82,7 +82,7 @@
 //     auto second = first->getOrCreateNode<float>();
 //     second->getArchetype()->getComponents<int>().push_back(std::make_shared<int>(1));
 //     second->getArchetype()->getComponents<int>().push_back(std::make_shared<int>(52));
-    
+
 //     second->getArchetype()->getComponents<float>().push_back(std::make_shared<float>(95.25));
 //     second->getArchetype()->getComponents<float>().push_back(std::make_shared<float>(284.7));
 
@@ -101,34 +101,79 @@
 //     }
 // }
 
+// int main()
+// {
+//     ArchetypeGraph graph;
+//     graph.addEntity(0, 1, 4.25f);
+//     graph.addEntity(1, 4, 219.3f);
+//     graph.addEntity(2, 29, 32.28f);
+//     graph.addEntity(3, 45);
+//     graph.addEntity(4, true, 87, 92.1f);
+
+//     auto compatibleArchetypes = graph.getCompatibleArchetypes<std::shared_ptr<int>, std::shared_ptr<float>>();
+
+//     for (auto [i]: graph.query<std::shared_ptr<int>>())
+//     {
+//         std::cout << *i << std::endl;
+//     }
+
+//     return 0;
+// }
+
+// class DummySystem : public System<int, float>
+// {
+// public:
+//     virtual void update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<int>, std::shared_ptr<float>> entities) override
+//     {
+//         for (auto [i, f] : entities)
+//         {
+//             std::cout << *i << ";" << *f << std::endl;
+//         }
+//     }
+// };
+
 int main()
 {
-    ArchetypeGraph graph;
-    graph.addEntity(0, 1, 4.25f);
-    graph.addEntity(1, 4, 219.3f);
-    graph.addEntity(2, 29, 32.28f);
-    graph.addEntity(3, 45);
-    graph.addEntity(4, false, 45, 92.1f);
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "ECS", sf::Style::Default);
 
-    auto signature = Type::getSignature<std::shared_ptr<int>, std::shared_ptr<float>>();
-    auto archetype = graph.getArchetype(signature);
-    auto test = archetype->computeSignature();
+    ECS ecs;
+    // DummySystem dummy;
+    // ecs.registerSystem(new DummySystem());
+    ecs.registerSystem(new AnimatedSpriteSystem(window));
 
-    for (auto [i, f] : archetype->getPartialEntities<std::shared_ptr<int>, std::shared_ptr<float>>())
+    ecs.m_archetypeGraph.addEntity(0, 1, 4.248f);
+    ecs.m_archetypeGraph.addEntity(1, 478, true, 'a', 92.32f);
+    ecs.m_archetypeGraph.addEntity(2, -24, "Hello World", 27.68f);
+
+    for (int i = 0; i < 100; i++)
     {
-        std::cout << *i << ";" << *f << std::endl;
+        for (int j = 0; j < 100; j++)
+        {
+            ecs.m_archetypeGraph.addEntity(3 + j + 10 * i, AnimatedSprite("assets/spritesheets/green.json", 7), Transform(sf::Vector2f(i * 32, j * 32)));
+        }
     }
 
-    signature = Type::getSignature<std::shared_ptr<int>>();
-    archetype = graph.getArchetype(signature);
+    sf::Clock timer;
 
-    for (auto i : archetype->getComponents<std::shared_ptr<int>>())
+    while (window.isOpen())
     {
-        std::cout << *i << std::endl;
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        window.clear();
+
+        timer.restart();
+        ecs.update();
+
+        auto elapsedTime = timer.restart().asMicroseconds();
+        std::cout << elapsedTime / 1000.0f << std::endl;
+
+        window.display();
     }
 
-    auto compatibleArchetypes = graph.getCompatibleArchetypes<std::shared_ptr<int>, std::shared_ptr<float>>();
-
-    for (auto [i, f]: graph.query<std::shared_ptr<int>, std::shared_ptr<float>>())
-    {}
+    return 0;
 }

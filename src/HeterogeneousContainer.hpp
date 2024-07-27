@@ -14,7 +14,7 @@ class Container;
 class BaseContainer
 {
 public:
-    virtual ~BaseContainer(){};
+    virtual ~BaseContainer() {};
     template <typename T>
     std::vector<T> &get();
     virtual void copy(const BaseContainer &from, int index) = 0;
@@ -80,9 +80,11 @@ public:
     class HeterogeneousContainerView
     {
         HeterogeneousContainer &parent;
+
+    public:
         class iterator : public std::iterator<
-                             std::input_iterator_tag, // iterator_category
-                             std::tuple<Components...>  // value_type
+                             std::input_iterator_tag,  // iterator_category
+                             std::tuple<Components...> // value_type
                              >
         {
         private:
@@ -161,7 +163,7 @@ public:
         }
 
     public:
-        HeterogeneousContainerView(HeterogeneousContainer &parent) : parent(parent){};
+        HeterogeneousContainerView(HeterogeneousContainer &parent) : parent(parent) {};
         iterator begin() { return iterator(_begin()); }
         iterator end() { return iterator(_end()); }
     };

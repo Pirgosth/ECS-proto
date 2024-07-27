@@ -8,7 +8,7 @@
             "name": "(gdb) Lancer",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/ECS",
+            "program": "${workspaceFolder}/build/ECS",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -79,50 +79,25 @@ public:
                              >
         {
         private:
-            std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> current;
-            std::set<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews;
-            typename std::set<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView;
-
-            template <typename T>
-            void incrementContainerIterator(std::shared_ptr<typename std::vector<T>::iterator> &iterator)
-            {
-                ++(*iterator);
-            }
-
-            void incrementContainerIterators(std::shared_ptr<typename std::vector<Components>::iterator>... containerIterators)
-            {
-                (incrementContainerIterator<Components>(containerIterators), ...);
-            }
-
-            template <typename T>
-            T retrieveValue(std::shared_ptr<typename std::vector<T>::iterator> iterator)
-            {
-                return *(*iterator);
-            }
-
-            std::tuple<Components...> retrieveValues()
-            {
-                return std::make_tuple(retrieveValue<Components>(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(current))...);
-            }
-
-            template <typename First, typename... Tail>
-            bool equals(iterator other) const
-            {
-                return *(std::get<0>(current)) == *(std::get<0>(other.current));
-            }
+            typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator current;
+            std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews;
+            typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView;
 
         public:
-            explicit iterator(std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> current,
-                              std::set<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews,
-                              typename std::set<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView) : current(current), archetypeViews(archetypeViews), currentView(currentView) {}
+            explicit iterator(typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator current,
+                              std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews,
+                              typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView) : current(current), archetypeViews(archetypeViews), currentView(currentView) {}
             iterator &operator++()
             {
-                if (*(std::get<0>(current)) == (*currentView).end())
+                current++;
+
+                if (current == (*currentView).end())
                 {
                     currentView++;
-                    current = currentView.begin();
+                    if (currentView != archetypeViews.end())
+                        current = currentView->begin();
                 }
-                incrementContainerIterators(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(current)...);
+
                 return *this;
             }
             iterator operator++(int)
@@ -131,24 +106,13 @@ public:
                 ++(*this);
                 return retval;
             }
-            bool operator==(iterator other) const { return equals<Components...>(other); }
+            bool operator==(iterator other) const { return current == other.current; }
             bool operator!=(iterator other) const { return !(*this == other); }
-            std::tuple<Components...> operator*() { return retrieveValues(); }
+            std::tuple<Components...> operator*() { return *current; }
         };
 
     private:
         std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> m_archetypeViews;
-
-        std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> _begin()
-        {
-            typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator archetypeView = m_archetypeViews.begin();
-            return *(*archetypeView).begin();
-        }
-
-        std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> _end()
-        {
-            return *(m_archetypeViews.back()).end();
-        }
 
     public:
         CompositeArchetypeView(std::set<std::shared_ptr<Archetype>> archetypes)
@@ -156,8 +120,8 @@ public:
             for (auto archetype : archetypes)
                 m_archetypeViews.push_back(archetype->getPartialEntities<Components...>());
         };
-        iterator begin() { return iterator(_begin(), m_archetypeViews, m_archetypeViews.begin()); }
-        iterator end() { return iterator(_end(), m_archetypeViews, m_archetypeViews.back()); }
+        iterator begin() { return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : m_archetypeViews.begin()->begin(), m_archetypeViews, m_archetypeViews.begin()); }
+        iterator end() { return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : m_archetypeViews.back().end(), m_archetypeViews, m_archetypeViews.end()); }
     };
 
     ArchetypeGraph();
