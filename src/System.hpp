@@ -19,13 +19,14 @@ class System: public BaseSystem
 private:
     virtual void notifyUpdate(ArchetypeGraph &graph) override;
 public:
-    virtual void update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<Components>...> entities) = 0;
+    virtual void update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<Components>...> &entities) = 0;
 };
 
 template <typename... Components>
 inline void System<Components...>::notifyUpdate(ArchetypeGraph &graph)
 {
-    update(graph.query<std::shared_ptr<Components>...>());
+    auto entities = graph.query<std::shared_ptr<Components>...>();
+    update(entities);
 }
 
 #endif // SYSTEM_H_INCLUDED

@@ -83,8 +83,8 @@ public:
 
     public:
         class iterator : public std::iterator<
-                             std::input_iterator_tag,  // iterator_category
-                             std::tuple<Components...> // value_type
+                             std::input_iterator_tag,    // iterator_category
+                             std::tuple<Components &...> // value_type
                              >
         {
         private:
@@ -96,26 +96,20 @@ public:
                 ++(*iterator);
             }
 
-            void incrementContainerIterators(std::shared_ptr<typename std::vector<Components>::iterator>... containerIterators)
+            void incrementContainerIterators(std::shared_ptr<typename std::vector<Components>::iterator> &...containerIterators)
             {
                 (incrementContainerIterator<Components>(containerIterators), ...);
             }
 
             template <typename T>
-            T retrieveValue(std::shared_ptr<typename std::vector<T>::iterator> iterator)
+            T &retrieveValue(std::shared_ptr<typename std::vector<T>::iterator> &iterator)
             {
                 return *(*iterator);
             }
 
-            std::tuple<Components...> retrieveValues()
+            std::tuple<Components &...> retrieveValues()
             {
-                return std::make_tuple(retrieveValue<Components>(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(current))...);
-            }
-
-            template <typename First, typename... Tail>
-            bool equals(iterator other) const
-            {
-                return *(std::get<0>(current)) == *(std::get<0>(other.current));
+                return std::forward_as_tuple(retrieveValue<Components>(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(current))...);
             }
 
         public:
@@ -131,9 +125,9 @@ public:
                 ++(*this);
                 return retval;
             }
-            bool operator==(iterator other) const { return equals<Components...>(other); }
-            bool operator!=(iterator other) const { return !(*this == other); }
-            std::tuple<Components...> operator*() { return retrieveValues(); }
+            bool operator==(iterator &other) const { return *(std::get<0>(current)) == *(std::get<0>(other.current)); }
+            bool operator!=(iterator &other) const { return !(*this == other); }
+            std::tuple<Components &...> operator*() { return retrieveValues(); }
         };
 
     private:

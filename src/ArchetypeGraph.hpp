@@ -75,27 +75,31 @@ public:
     {
         class iterator : public std::iterator<
                              std::input_iterator_tag,  // iterator_category
-                             std::tuple<Components...> // value_type
+                             std::tuple<Components&...> // value_type
                              >
         {
         private:
-            typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator current;
-            std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews;
-            typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView;
+            typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator m_current;
+            std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &m_archetypeViews;
+            typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator m_currentView;
+            typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator m_currentViewEnd;
 
         public:
             explicit iterator(typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator current,
                               std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews,
-                              typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView) : current(current), archetypeViews(archetypeViews), currentView(currentView) {}
+                              typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView) : m_current(current), m_archetypeViews(archetypeViews), m_currentView(currentView), m_currentViewEnd(currentView == archetypeViews.end() ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : (*currentView).end()) {}
             iterator &operator++()
             {
-                current++;
+                ++m_current;
 
-                if (current == (*currentView).end())
+                if (m_current == m_currentViewEnd)
                 {
-                    currentView++;
-                    if (currentView != archetypeViews.end())
-                        current = currentView->begin();
+                    m_currentView++;
+                    if (m_currentView != m_archetypeViews.end())
+                    {
+                        m_currentViewEnd = (++m_currentView)->end();
+                        m_current = m_currentView->begin();
+                    }
                 }
 
                 return *this;
@@ -106,16 +110,16 @@ public:
                 ++(*this);
                 return retval;
             }
-            bool operator==(iterator other) const { return current == other.current; }
-            bool operator!=(iterator other) const { return !(*this == other); }
-            std::tuple<Components...> operator*() { return *current; }
+            bool operator==(iterator &other) const { return m_current == other.m_current; }
+            bool operator!=(iterator &other) const { return !(*this == other); }
+            std::tuple<Components&...> operator*() { return *m_current; }
         };
 
     private:
         std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> m_archetypeViews;
 
     public:
-        CompositeArchetypeView(std::set<std::shared_ptr<Archetype>> archetypes)
+        CompositeArchetypeView(std::set<std::shared_ptr<Archetype>> &archetypes)
         {
             for (auto archetype : archetypes)
                 m_archetypeViews.push_back(archetype->getPartialEntities<Components...>());
@@ -212,7 +216,8 @@ inline std::set<std::shared_ptr<Archetype>> ArchetypeGraph::getCompatibleArchety
 template <typename... Components>
 inline ArchetypeGraph::CompositeArchetypeView<Components...> ArchetypeGraph::query()
 {
-    return CompositeArchetypeView<Components...>(getCompatibleArchetypes<Components...>());
+    auto archetypes = getCompatibleArchetypes<Components...>();
+    return CompositeArchetypeView<Components...>(archetypes);
 }
 
 #endif // ARCHETYPEGRAPH_H_INCLUDED

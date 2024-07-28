@@ -4,7 +4,7 @@ AnimatedSpriteSystem::AnimatedSpriteSystem(sf::RenderWindow &window): m_window(w
 
 }
 
-void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<AnimatedSprite>, std::shared_ptr<Transform>> entities)
+void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<AnimatedSprite>, std::shared_ptr<Transform>> &entities)
 {
     for (auto [animatedSprite, transform] : entities)
     {
