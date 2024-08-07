@@ -23,21 +23,20 @@ struct SpritesheetRecord
 
 class AnimatedSprite
 {
-    friend AnimatedSpriteSystem;
 private:
     static TextureManager g_textureManager;
     static std::unordered_map<std::string, std::shared_ptr<SpritesheetRecord>> g_spritesheetCache;
-    
-    std::vector<sf::IntRect> *m_spritesheet;
+
     std::shared_ptr<sf::Texture> m_spritesheetTexture;
-    sf::Sprite m_activeSprite;
-    unsigned int m_activeSpriteIndex;
-    sf::Clock m_clock;
-    
-    float m_ips;
 
     const static std::shared_ptr<SpritesheetRecord> getOrLoadSpritesheet(std::string path);
 public:
+    float m_ips;
+    std::vector<sf::IntRect> *m_spritesheet;
+    sf::Sprite m_activeSprite;
+    unsigned int m_activeSpriteIndex;
+    sf::Clock m_clock;
+
     AnimatedSprite(std::string spritesheetPath, float ips);
 };
 

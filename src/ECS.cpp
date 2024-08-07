@@ -1,5 +1,7 @@
 #include "ECS.hpp"
 
+EntityId ECS::g_entityCounter = 0;
+
 void ECS::update()
 {
     for (auto system : m_systems)

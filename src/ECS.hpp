@@ -8,13 +8,24 @@
 
 class ECS
 {
-public:
+private:
+    static EntityId g_entityCounter;
     ArchetypeGraph m_archetypeGraph;
     std::set<std::shared_ptr<BaseSystem>> m_systems;
 
 public:
+    template <typename... Components>
+    EntityId createEntity(Components... components);
     void registerSystem(BaseSystem *system);
     void update();
 };
+
+template <typename... Components>
+inline EntityId ECS::createEntity(Components... components)
+{
+    auto entityId = g_entityCounter++;
+    m_archetypeGraph.addEntity(entityId, components...);
+    return entityId;
+}
 
 #endif // ECS_H_INCLUDED

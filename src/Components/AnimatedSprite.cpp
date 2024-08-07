@@ -31,7 +31,7 @@ const std::shared_ptr<SpritesheetRecord> AnimatedSprite::getOrLoadSpritesheet(st
     return g_spritesheetCache.at(path);
 }
 
-AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_activeSpriteIndex(0), m_ips(ips)
+AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_ips(ips), m_activeSpriteIndex(0)
 {
     auto jsonSpriteSheet = getOrLoadSpritesheet(spritesheetPath);
     m_spritesheetTexture = g_textureManager.getOrCreateTexture(jsonSpriteSheet->path);

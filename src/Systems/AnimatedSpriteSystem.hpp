@@ -9,10 +9,8 @@
 
 class AnimatedSpriteSystem : public System<AnimatedSprite, Transform>
 {
-private:
-    sf::RenderWindow &m_window;
+
 public:
-    AnimatedSpriteSystem(sf::RenderWindow &window);
     virtual void update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<AnimatedSprite>, std::shared_ptr<Transform>> &entities) override;
 };
 

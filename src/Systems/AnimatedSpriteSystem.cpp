@@ -1,9 +1,5 @@
 #include "AnimatedSpriteSystem.hpp"
 
-AnimatedSpriteSystem::AnimatedSpriteSystem(sf::RenderWindow &window): m_window(window) {
-
-}
-
 void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<AnimatedSprite>, std::shared_ptr<Transform>> &entities)
 {
     for (auto [animatedSprite, transform] : entities)
@@ -18,6 +14,5 @@ void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::sh
         }
 
         activeSprite.setPosition(transform->m_position);
-        m_window.draw(activeSprite);
     }
 }
