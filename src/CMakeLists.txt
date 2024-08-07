@@ -1,25 +1,17 @@
-# Allow for relative headers import
-include_directories(${CMAKE_SOURCE_DIR}/src)
+add_subdirectory(Components)
+add_subdirectory(Systems)
 
-include(FetchContent)
-
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
-FetchContent_MakeAvailable(json)
-
-add_executable(
+target_sources(
     ECS
-    main.cpp
+    PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/main.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Archetype.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ArchetypeGraph.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ECS.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Engine.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/HeterogeneousContainer.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/System.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TextureManager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TypeId.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Types.cpp
 )
-
-target_compile_features(ECS INTERFACE cxx_std_17)
-
-add_subdirectory(Engine)
-
-find_package(SFML COMPONENTS system graphics audio REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
-
-target_link_libraries(ECS sfml-system sfml-window sfml-graphics sfml-audio nlohmann_json::nlohmann_json)
-
-add_custom_command(TARGET ECS PRE_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:ECS>/assets)

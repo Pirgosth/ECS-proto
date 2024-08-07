@@ -1,50 +1,54 @@
 #include <iostream>
-#include <string>
 
 #include <SFML/Graphics.hpp>
 
-#include "Engine/ECS/Engine.hpp"
-#include "Engine/ECS/System/Implementation/SpriteSystem.hpp"
-#include "Engine/ECS/System/Implementation/AnimatedSpriteSystem.hpp"
-#include "Engine/ECS/System/Implementation/BasicCollisionSystem.hpp"
-#include "Engine/ECS/System/Implementation/GravitySystem.hpp"
-
-class DummyComponent : public Component
-{
-};
+#include "ECS.hpp"
+#include "Engine.hpp"
+#include "System.hpp"
+#include "Systems/AnimatedSpriteSystem.hpp"
+#include "Systems/BasicCollisionSystem.hpp"
+#include "Systems/GravitySystem.hpp"
+#include "Systems/RenderSystem.hpp"
 
 int main()
 {
-    Engine engine;
-
     sf::RenderWindow window(sf::VideoMode(1280, 720), "ECS", sf::Style::Default);
 
-    engine.registerSystem(new SpriteSystem(window));
-    engine.registerSystem(new AnimatedSpriteSystem(window));
-    engine.registerSystem(new BasicCollisionSystem());
-    engine.registerSystem(new GravitySystem());
+    ECS ecs;
+    Engine engine;
+
+    ecs.registerSystem(new AnimatedSpriteSystem());
+    ecs.registerSystem(new BasicCollisionSystem());
+    ecs.registerSystem(new GravitySystem(engine));
+    ecs.registerSystem(new RenderSystem(window));
+
+    ecs.createEntity(1, 4.248f);
+    ecs.createEntity(478, true, 'a', 92.32f);
+    ecs.createEntity(-24, "Hello World", 27.68f);
 
     for (int i = 0; i < 27; i++)
     {
-        auto testEntity = engine.makeEntity();
-        engine.addComponent(testEntity, new Transform(sf::Vector2f(100 + 40 * i, 150 - 10 * i)));
-        engine.addComponent(testEntity, new AnimatedSprite("assets/spritesheets/green.json", 6));
-        engine.addComponent(testEntity, new Body());
+        ecs.createEntity(AnimatedSprite("assets/spritesheets/green.json", 6), Transform(sf::Vector2f(100 + 40 * i, 150 - 10 * i)), Body());
     }
 
-    engine.start();
+    sf::Clock timer;
 
-    while (engine.isRunning())
+    while (window.isOpen())
     {
+        engine.m_deltaTimeInSec = timer.restart().asMicroseconds() / 1000000.0f;
+        std::cout << engine.m_deltaTimeInSec * 1000.0f << std::endl;
+
         sf::Event event;
         while (window.pollEvent(event))
-        {  
+        {
             if (event.type == sf::Event::Closed)
-                engine.stop();
+                window.close();
         }
 
         window.clear();
-        engine.draw(window);
+
+        ecs.update();
+
         window.display();
     }
 
