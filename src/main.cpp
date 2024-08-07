@@ -35,6 +35,9 @@ int main()
 
     while (window.isOpen())
     {
+        engine.m_deltaTimeInSec = timer.restart().asMicroseconds() / 1000000.0f;
+        std::cout << engine.m_deltaTimeInSec * 1000.0f << std::endl;
+
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -44,11 +47,7 @@ int main()
 
         window.clear();
 
-        timer.restart();
         ecs.update();
-
-        engine.m_deltaTimeInSec = timer.restart().asMicroseconds() / 1000000.0f;
-        std::cout << engine.m_deltaTimeInSec * 1000.0f << std::endl;
 
         window.display();
     }
