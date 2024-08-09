@@ -21,6 +21,8 @@ public:
     typename HeterogeneousContainer::HeterogeneousContainerView<Components...> getPartialEntities();
     template <typename Component>
     Archetype extend();
+    template <typename Component>
+    Archetype reduce();
     template <typename ...Components>
     unsigned int push_back(Components... components);
     ArchetypeSignature computeSignature();
@@ -55,6 +57,16 @@ inline Archetype Archetype::extend()
     extended.m_components.addContainer<Component>();
 
     return extended;
+}
+
+template <typename Component>
+inline Archetype Archetype::reduce()
+{
+    auto reduced = Archetype();
+    reduced.m_components = m_components.clone();
+    reduced.m_components.removeContainer<Component>();
+
+    return reduced;
 }
 
 template <typename... Components>

@@ -166,6 +166,9 @@ public:
     void addContainer();
 
     template <typename T>
+    void removeContainer();
+
+    template <typename T>
     std::vector<T> &get();
 
     template <typename... Types>
@@ -194,6 +197,16 @@ inline std::vector<T> &HeterogeneousContainer::get()
 
     assert(m_containers.count(id) != 0);
     return m_containers.at(id)->template get<T>();
+}
+
+template <typename T>
+inline void HeterogeneousContainer::removeContainer()
+{
+    auto id = Type::getId<T>();
+
+    assert(m_containers.count(id) != 0 && "No container with provided type!");
+
+    m_containers.erase(id);
 }
 
 template <typename... Types>

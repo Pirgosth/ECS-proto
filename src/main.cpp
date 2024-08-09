@@ -22,16 +22,20 @@ int main()
     ecs.registerSystem(new GravitySystem(engine));
     ecs.registerSystem(new RenderSystem(window));
 
-    ecs.createEntity(1, 4.248f);
-    ecs.createEntity(478, true, 'a', 92.32f);
-    ecs.createEntity(-24, "Hello World", 27.68f);
-
     for (int i = 0; i < 27; i++)
     {
         ecs.createEntity(AnimatedSprite("assets/spritesheets/green.json", 6), Transform(sf::Vector2f(100 + 40 * i, 150 - 10 * i)), Body());
     }
 
     sf::Clock timer;
+
+    for (int i = 0; i < 27; i++)
+    {
+        if (i % 2 == 0)
+            continue;
+
+        ecs.deleteComponent<std::shared_ptr<Body>>(i);
+    }
 
     while (window.isOpen())
     {

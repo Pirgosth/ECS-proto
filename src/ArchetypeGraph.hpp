@@ -68,14 +68,15 @@ private:
     std::unordered_map<EntityId, EntityRecord> m_entitiesRecords;
     std::unordered_map<TypeId, std::set<std::shared_ptr<Node>>> m_componentArchetypes;
     std::shared_ptr<Node> getOrCreateNode(std::shared_ptr<Node> parent, const ArchetypeSignature &signature, TypeId componentId);
+    std::shared_ptr<Node> getOrCreateNodes(const ArchetypeSignature &signature);
 
 public:
     template <typename... Components>
     class CompositeArchetypeView
     {
         class iterator : public std::iterator<
-                             std::input_iterator_tag,  // iterator_category
-                             std::tuple<Components&...> // value_type
+                             std::input_iterator_tag,    // iterator_category
+                             std::tuple<Components &...> // value_type
                              >
         {
         private:
@@ -91,13 +92,13 @@ public:
             iterator &operator++()
             {
                 ++m_current;
-
+                
                 if (m_current == m_currentViewEnd)
                 {
                     m_currentView++;
                     if (m_currentView != m_archetypeViews.end())
                     {
-                        m_currentViewEnd = (++m_currentView)->end();
+                        m_currentViewEnd = m_currentView->end();
                         m_current = m_currentView->begin();
                     }
                 }
@@ -112,11 +113,22 @@ public:
             }
             bool operator==(iterator &other) const { return m_current == other.m_current; }
             bool operator!=(iterator &other) const { return !(*this == other); }
-            std::tuple<Components&...> operator*() { return *m_current; }
+            std::tuple<Components &...> operator*() { return *m_current; }
         };
 
     private:
         std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> m_archetypeViews;
+        iterator _begin()
+        {
+            for (auto view = m_archetypeViews.begin(); view != m_archetypeViews.end(); ++view)
+            {
+                auto end = view->end();
+                if (view->begin() != end)
+                    return iterator(view->begin(), m_archetypeViews, view);
+            }
+
+            return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : m_archetypeViews.back().end(), m_archetypeViews, m_archetypeViews.end());
+        }
 
     public:
         CompositeArchetypeView(std::set<std::shared_ptr<Archetype>> &archetypes)
@@ -124,14 +136,20 @@ public:
             for (auto archetype : archetypes)
                 m_archetypeViews.push_back(archetype->getPartialEntities<Components...>());
         };
-        iterator begin() { return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : m_archetypeViews.begin()->begin(), m_archetypeViews, m_archetypeViews.begin()); }
+        iterator begin() { return _begin(); }
         iterator end() { return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : m_archetypeViews.back().end(), m_archetypeViews, m_archetypeViews.end()); }
     };
 
     ArchetypeGraph();
     std::shared_ptr<Archetype> getArchetype(const ArchetypeSignature &signature);
     template <typename... Components>
+
     void addEntity(EntityId id, Components... components);
+    template <typename Component>
+    Component &getComponent(EntityId id);
+    template <typename Component>
+    void deleteComponent(EntityId id);
+
     template <typename... Components>
     std::set<std::shared_ptr<Archetype>> getCompatibleArchetypes();
     template <typename... Components>
@@ -155,6 +173,20 @@ inline std::shared_ptr<Node> ArchetypeGraph::getOrCreateNode(std::shared_ptr<Nod
     return node;
 }
 
+inline std::shared_ptr<Node> ArchetypeGraph::getOrCreateNodes(const ArchetypeSignature &signature)
+{
+    auto node = m_root;
+    ArchetypeSignature currentSignature;
+
+    for (auto componentId : signature)
+    {
+        currentSignature.emplace(componentId);
+        node = getOrCreateNode(node, currentSignature, componentId);
+    }
+
+    return node;
+}
+
 template <typename... Components>
 inline void ArchetypeGraph::addEntity(EntityId id, Components... components)
 {
@@ -174,6 +206,37 @@ inline void ArchetypeGraph::addEntity(EntityId id, Components... components)
 
     auto componentsIndex = node->getArchetype()->push_back(std::make_shared<Components>(std::move(components))...);
     m_entitiesRecords.emplace(id, EntityRecord(node, componentsIndex));
+}
+
+template <typename Component>
+inline Component &ArchetypeGraph::getComponent(EntityId id)
+{
+    assert(m_entitiesRecords.count(id) != 0 && "No entity found with this id!");
+
+    auto record = m_entitiesRecords.at(id);
+    return record.archetypeNode->getArchetype()->getComponents<Component>()[record.componentsIndex];
+}
+
+template <typename Component>
+inline void ArchetypeGraph::deleteComponent(EntityId id)
+{
+    assert(m_entitiesRecords.count(id) != 0 && "No entity record found with this id!");
+
+    auto &entityRecord = m_entitiesRecords.at(id);
+    auto currentSignature = entityRecord.archetypeNode->getArchetype()->computeSignature();
+    auto componentId = Type::getId<Component>();
+
+    assert(currentSignature.find(componentId) != currentSignature.end() && "This entity does not have this component!");
+
+    currentSignature.erase(componentId);
+
+    auto toNode = getOrCreateNodes(currentSignature);
+
+    if (!toNode->getArchetype())
+        toNode->setArchetype(entityRecord.archetypeNode->getArchetype()->reduce<Component>());
+
+
+    entityRecord.archetypeNode = toNode;
 }
 
 template <typename... Components>
