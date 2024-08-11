@@ -10,6 +10,7 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/ECS.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Engine.hpp
     ${CMAKE_CURRENT_LIST_DIR}/HeterogeneousContainer.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/SoftDeleteContainer.hpp
     ${CMAKE_CURRENT_LIST_DIR}/System.hpp
     ${CMAKE_CURRENT_LIST_DIR}/TextureManager.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TypeId.hpp
