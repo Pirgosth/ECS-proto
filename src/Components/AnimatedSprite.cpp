@@ -33,6 +33,11 @@ const std::shared_ptr<SpritesheetRecord> AnimatedSprite::getOrLoadSpritesheet(st
 
 AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_ips(ips), m_activeSpriteIndex(0)
 {
+    setSprite(spritesheetPath);
+}
+
+void AnimatedSprite::setSprite(std::string spritesheetPath)
+{
     auto jsonSpriteSheet = getOrLoadSpritesheet(spritesheetPath);
     m_spritesheetTexture = g_textureManager.getOrCreateTexture(jsonSpriteSheet->path);
     m_spritesheet = &jsonSpriteSheet->sprites;

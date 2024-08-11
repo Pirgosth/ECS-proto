@@ -38,6 +38,7 @@ public:
     sf::Clock m_clock;
 
     AnimatedSprite(std::string spritesheetPath, float ips);
+    void setSprite(std::string spritesheetPath);
 };
 
 
