@@ -26,6 +26,8 @@ unsigned int HeterogeneousContainer::push_back(HeterogeneousContainer &from, uns
 
         container->copy(*fromContainer, componentIndex);
     }
+
+    m_elements.push_back(insertedId);
     return insertedId;
 }
 

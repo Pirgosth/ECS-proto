@@ -31,12 +31,13 @@ int main()
 
     sf::Clock timer;
 
-    for (int i = 0; i < 27; i++)
+    for (unsigned int i = 0; i < 27; i++)
     {
-        if (i % 2 == 0)
-            continue;
-
-        ecs.deleteComponent<std::shared_ptr<Body>>(i);
+        if (i % 2 == 1)
+            ecs.deleteComponent<std::shared_ptr<Body>>(i);
+        
+        if (i % 4 == 1)
+            ecs.deleteEntity(i);
     }
 
     bool pause = false;

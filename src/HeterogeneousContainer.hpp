@@ -121,9 +121,25 @@ public:
             std::tuple<Components &...> operator*() { return std::forward_as_tuple(m_parent->get<Components>()[m_currentIndex]...); }
         };
 
+    private:
+        // Need to lookup for first non deleted value, if there's any
+        iterator _begin()
+        {
+            if (parent.size() - parent.m_erasedCount <= 0)
+                return iterator(&parent, 0);
+
+            for (unsigned int i = 0; i < parent.size(); i++)
+            {
+                if (parent.isAlive(i))
+                    return iterator(&parent, i);
+            }
+
+            return iterator(&parent, 0);
+        }
+
     public:
         HeterogeneousContainerView(HeterogeneousContainer &parent) : parent(parent) {};
-        iterator begin() { return iterator(&parent, 0); }
+        iterator begin() { return _begin(); }
         iterator end() { return iterator(&parent, parent.size()); }
     };
 

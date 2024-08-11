@@ -29,3 +29,13 @@ std::shared_ptr<Archetype> ArchetypeGraph::getArchetype(const ArchetypeSignature
     }
     return currentNode->getArchetype();
 }
+
+void ArchetypeGraph::deleteEntity(EntityId id)
+{
+    assert(m_entitiesRecords.count(id) != 0 && "No entity record found with this id!");
+
+    auto &entityRecord = m_entitiesRecords.at(id);
+    entityRecord.archetypeNode->getArchetype()->erase(entityRecord.componentsIndex);
+
+    m_entitiesRecords.erase(id);
+}

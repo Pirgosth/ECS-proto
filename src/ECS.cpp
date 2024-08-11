@@ -12,7 +12,7 @@ ECS::ECS(): m_entityCounter(0) {}
 
 void ECS::deleteEntity(EntityId id)
 {
-
+    m_archetypeGraph.deleteEntity(id);
 }
 
 void ECS::registerSystem(BaseSystem *system)

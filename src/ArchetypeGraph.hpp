@@ -149,6 +149,7 @@ public:
     Component &getComponent(EntityId id);
     template <typename Component>
     void deleteComponent(EntityId id);
+    void deleteEntity(EntityId id);
 
     template <typename... Components>
     std::set<std::shared_ptr<Archetype>> getCompatibleArchetypes();
@@ -224,8 +225,6 @@ inline void ArchetypeGraph::deleteComponent(EntityId id)
 
     auto &entityRecord = m_entitiesRecords.at(id);
 
-    entityRecord.archetypeNode->getArchetype()->erase(entityRecord.componentsIndex);
-
     auto currentSignature = entityRecord.archetypeNode->getArchetype()->computeSignature();
     auto componentId = Type::getId<Component>();
 
@@ -238,8 +237,11 @@ inline void ArchetypeGraph::deleteComponent(EntityId id)
     if (!toNode->getArchetype())
         toNode->setArchetype(entityRecord.archetypeNode->getArchetype()->reduce<Component>());
 
-    entityRecord.componentsIndex = entityRecord.archetypeNode->getArchetype()->transfertEntity(*toNode->getArchetype(), entityRecord.componentsIndex);
+    auto transferedComponentIndex = entityRecord.archetypeNode->getArchetype()->transfertEntity(*toNode->getArchetype(), entityRecord.componentsIndex);
+    entityRecord.archetypeNode->getArchetype()->erase(entityRecord.componentsIndex);
+    
     entityRecord.archetypeNode = toNode;
+    entityRecord.componentsIndex = transferedComponentIndex;
 }
 
 template <typename... Components>
