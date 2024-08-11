@@ -70,10 +70,16 @@ inline int Container<T>::size() const
 class HeterogeneousContainer
 {
 private:
+    unsigned int m_elementCount;
+    std::vector<unsigned int> m_elements;
+
+    unsigned int m_lastElementErased;
+    unsigned int m_erasedCount;
+
     std::unordered_map<TypeId, std::shared_ptr<BaseContainer>> m_containers;
 
 public:
-    HeterogeneousContainer() = default;
+    HeterogeneousContainer();
     HeterogeneousContainer(const HeterogeneousContainer &x);
     HeterogeneousContainer clone() const;
     template <typename... Components>
@@ -88,35 +94,20 @@ public:
                              >
         {
         private:
-            std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> current;
-
-            template <typename T>
-            void incrementContainerIterator(std::shared_ptr<typename std::vector<T>::iterator> &iterator)
-            {
-                ++(*iterator);
-            }
-
-            void incrementContainerIterators(std::shared_ptr<typename std::vector<Components>::iterator> &...containerIterators)
-            {
-                (incrementContainerIterator<Components>(containerIterators), ...);
-            }
-
-            template <typename T>
-            T &retrieveValue(std::shared_ptr<typename std::vector<T>::iterator> &iterator)
-            {
-                return *(*iterator);
-            }
-
-            std::tuple<Components &...> retrieveValues()
-            {
-                return std::forward_as_tuple(retrieveValue<Components>(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(current))...);
-            }
+            HeterogeneousContainer *m_parent;
+            unsigned int m_currentIndex;
 
         public:
-            explicit iterator(std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> _current) : current(_current) {}
+            explicit iterator(HeterogeneousContainer *_parent, unsigned int currentIndex) : m_parent(_parent), m_currentIndex(currentIndex) {}
+            
             iterator &operator++()
             {
-                incrementContainerIterators(std::get<std::shared_ptr<typename std::vector<Components>::iterator>>(current)...);
+                ++m_currentIndex;
+                while (m_currentIndex < m_parent->m_elementCount && !m_parent->isAlive(m_currentIndex))
+                {
+                    ++m_currentIndex;
+                    continue;
+                }
                 return *this;
             }
             iterator operator++(int)
@@ -125,41 +116,15 @@ public:
                 ++(*this);
                 return retval;
             }
-            bool operator==(iterator &other) const { return *(std::get<0>(current)) == *(std::get<0>(other.current)); }
+            bool operator==(iterator &other) const { return m_parent == other.m_parent && m_currentIndex == other.m_currentIndex; }
             bool operator!=(iterator &other) const { return !(*this == other); }
-            std::tuple<Components &...> operator*() { return retrieveValues(); }
+            std::tuple<Components &...> operator*() { return std::forward_as_tuple(m_parent->get<Components>()[m_currentIndex]...); }
         };
-
-    private:
-        template <typename T>
-        std::shared_ptr<typename std::vector<T>::iterator> _begin()
-        {
-            auto beg = parent.template get<T>().begin();
-            return std::make_shared<typename std::vector<T>::iterator>(beg);
-        }
-
-        std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> _begin()
-        {
-            auto tuple = std::make_tuple(_begin<Components>()...);
-            return tuple;
-        }
-
-        template <typename T>
-        std::shared_ptr<typename std::vector<T>::iterator> _end()
-        {
-            auto end = parent.template get<T>().end();
-            return std::make_shared<typename std::vector<T>::iterator>(end);
-        }
-
-        std::tuple<std::shared_ptr<typename std::vector<Components>::iterator>...> _end()
-        {
-            return std::make_tuple(_end<Components>()...);
-        }
 
     public:
         HeterogeneousContainerView(HeterogeneousContainer &parent) : parent(parent) {};
-        iterator begin() { return iterator(_begin()); }
-        iterator end() { return iterator(_end()); }
+        iterator begin() { return iterator(&parent, 0); }
+        iterator end() { return iterator(&parent, parent.size()); }
     };
 
     template <typename T>
@@ -170,6 +135,15 @@ public:
 
     template <typename T>
     std::vector<T> &get();
+
+    template <typename ...Types>
+    unsigned int push_back(Types... values);
+
+    unsigned int push_back(HeterogeneousContainer &from, unsigned int componentIndex);
+
+    bool isAlive(unsigned int index);
+
+    bool erase(unsigned int index);
 
     template <typename... Types>
     HeterogeneousContainerView<Types...> getView();
@@ -197,6 +171,15 @@ inline std::vector<T> &HeterogeneousContainer::get()
 
     assert(m_containers.count(id) != 0);
     return m_containers.at(id)->template get<T>();
+}
+
+template <typename... Types>
+inline unsigned int HeterogeneousContainer::push_back(Types... values)
+{
+    auto insertedId = m_elementCount++;
+    (get<Types>().push_back(values), ...);
+    m_elements.push_back(insertedId);
+    return insertedId;
 }
 
 template <typename T>

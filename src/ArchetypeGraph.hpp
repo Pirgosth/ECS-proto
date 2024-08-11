@@ -88,7 +88,7 @@ public:
         public:
             explicit iterator(typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator current,
                               std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews,
-                              typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView) : m_current(current), m_archetypeViews(archetypeViews), m_currentView(currentView), m_currentViewEnd(currentView == archetypeViews.end() ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : (*currentView).end()) {}
+                              typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView) : m_current(current), m_archetypeViews(archetypeViews), m_currentView(currentView), m_currentViewEnd(currentView == archetypeViews.end() ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(nullptr, -1) : (*currentView).end()) {}
             iterator &operator++()
             {
                 ++m_current;
@@ -127,7 +127,7 @@ public:
                     return iterator(view->begin(), m_archetypeViews, view);
             }
 
-            return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : m_archetypeViews.back().end(), m_archetypeViews, m_archetypeViews.end());
+            return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(nullptr, -1) : m_archetypeViews.back().end(), m_archetypeViews, m_archetypeViews.end());
         }
 
     public:
@@ -137,7 +137,7 @@ public:
                 m_archetypeViews.push_back(archetype->getPartialEntities<Components...>());
         };
         iterator begin() { return _begin(); }
-        iterator end() { return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(std::make_tuple((std::make_shared<typename std::vector<Components>::iterator>(nullptr))...)) : m_archetypeViews.back().end(), m_archetypeViews, m_archetypeViews.end()); }
+        iterator end() { return iterator(m_archetypeViews.size() == 0 ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(nullptr, -1) : m_archetypeViews.back().end(), m_archetypeViews, m_archetypeViews.end()); }
     };
 
     ArchetypeGraph();
@@ -223,6 +223,9 @@ inline void ArchetypeGraph::deleteComponent(EntityId id)
     assert(m_entitiesRecords.count(id) != 0 && "No entity record found with this id!");
 
     auto &entityRecord = m_entitiesRecords.at(id);
+
+    entityRecord.archetypeNode->getArchetype()->erase(entityRecord.componentsIndex);
+
     auto currentSignature = entityRecord.archetypeNode->getArchetype()->computeSignature();
     auto componentId = Type::getId<Component>();
 
@@ -235,7 +238,7 @@ inline void ArchetypeGraph::deleteComponent(EntityId id)
     if (!toNode->getArchetype())
         toNode->setArchetype(entityRecord.archetypeNode->getArchetype()->reduce<Component>());
 
-
+    entityRecord.componentsIndex = entityRecord.archetypeNode->getArchetype()->transfertEntity(*toNode->getArchetype(), entityRecord.componentsIndex);
     entityRecord.archetypeNode = toNode;
 }
 

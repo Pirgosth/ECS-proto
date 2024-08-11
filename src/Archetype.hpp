@@ -23,8 +23,12 @@ public:
     Archetype extend();
     template <typename Component>
     Archetype reduce();
+
+    unsigned int transfertEntity(Archetype &target, unsigned int componentId);
+
     template <typename ...Components>
     unsigned int push_back(Components... components);
+    bool erase(unsigned int componentIndex);
     ArchetypeSignature computeSignature();
 };
 
@@ -72,8 +76,7 @@ inline Archetype Archetype::reduce()
 template <typename... Components>
 inline unsigned int Archetype::push_back(Components... components)
 {
-    ((m_components.get<Components>().push_back(components)), ...);
-    return m_components.size() - 1;
+    return m_components.push_back<Components...>(components...);
 }
 
 #endif // ARCHETYPE_H_INCLUDED
