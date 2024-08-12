@@ -1,4 +1,4 @@
-#include "AnimatedSprite.hpp"
+#include "Components/AnimatedSprite.hpp"
 
 std::unordered_map<std::string, std::shared_ptr<SpritesheetRecord>> AnimatedSprite::g_spritesheetCache;
 

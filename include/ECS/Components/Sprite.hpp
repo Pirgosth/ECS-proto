@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "TextureManager.hpp"
+#include "../TextureManager.hpp"
 
 class Sprite
 {

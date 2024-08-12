@@ -1,4 +1,4 @@
-#include "AnimatedSpriteSystem.hpp"
+#include "Systems/AnimatedSpriteSystem.hpp"
 
 void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<Sprite>, std::shared_ptr<AnimatedSprite>> &entities)
 {

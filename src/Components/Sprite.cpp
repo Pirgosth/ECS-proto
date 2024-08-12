@@ -1,4 +1,4 @@
-#include "Sprite.hpp"
+#include "Components/Sprite.hpp"
 
 TextureManager Sprite::g_textureManager;
 

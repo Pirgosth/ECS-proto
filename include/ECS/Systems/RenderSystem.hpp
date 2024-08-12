@@ -5,9 +5,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Components/Sprite.hpp"
-#include "Components/Transform.hpp"
-#include "System.hpp"
+#include "../Components/Sprite.hpp"
+#include "../Components/Transform.hpp"
+#include "../System.hpp"
 
 class RenderSystem : public System<Sprite, Transform>
 {

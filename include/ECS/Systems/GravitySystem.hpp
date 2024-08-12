@@ -1,10 +1,10 @@
 #ifndef GRAVITYSYSTEM_H_INCLUDED
 #define GRAVITYSYSTEM_H_INCLUDED
 
-#include "Engine.hpp"
-#include "System.hpp"
-#include "Components/Body.hpp"
-#include "Components/Transform.hpp"
+#include "../Engine.hpp"
+#include "../System.hpp"
+#include "../Components/Body.hpp"
+#include "../Components/Transform.hpp"
 
 class GravitySystem : public System<Transform, Body>
 {
