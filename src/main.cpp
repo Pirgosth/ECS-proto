@@ -24,7 +24,7 @@ int main()
 
     for (int i = 0; i < 27; i++)
     {
-        ecs.createEntity(Sprite("assets/green.png"), AnimatedSprite("assets/spritesheets/green.json", 6), Transform(sf::Vector2f(100 + 40 * i, 150 - 10 * i)), Body());
+        ecs.createEntity(Sprite("assets/green.png", 1), AnimatedSprite("assets/spritesheets/green.json", 6), Transform(sf::Vector2f(100 + 40 * i, 150 - 10 * i)), Body());
     }
 
     ecs.createEntity(Sprite("assets/background.png"), Transform(sf::Vector2f(0, 0)));

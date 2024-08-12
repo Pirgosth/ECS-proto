@@ -2,7 +2,7 @@
 
 TextureManager Sprite::g_textureManager;
 
-Sprite::Sprite(std::string texturePath)
+Sprite::Sprite(std::string texturePath, int zIndex): m_zIndex(zIndex)
 {
     setTexture(texturePath); 
 }
