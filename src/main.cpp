@@ -24,13 +24,21 @@ int main()
 
     for (int i = 0; i < 27; i++)
     {
-        ecs.createEntity(AnimatedSprite("assets/spritesheets/green.json", 6), Transform(sf::Vector2f(100 + 40 * i, 150 - 5 * i)), Body());
+        ecs.createEntity(Sprite("assets/green.png"), AnimatedSprite("assets/spritesheets/green.json", 6), Transform(sf::Vector2f(100 + 40 * i, 150 - 10 * i)), Body());
     }
+
+    ecs.createEntity(Sprite("assets/background.png"), Transform(sf::Vector2f(0, 0)));
 
     sf::Clock timer;
 
     for (unsigned int i = 0; i < 27; i++)
     {
+        if (i % 2 == 0)
+        {
+            auto sprite = ecs.getComponent<std::shared_ptr<Sprite>>(i);
+            sprite->setTexture("assets/red.png");
+        }
+
         if (i % 2 == 1)
             ecs.deleteComponent<std::shared_ptr<Body>>(i);
         

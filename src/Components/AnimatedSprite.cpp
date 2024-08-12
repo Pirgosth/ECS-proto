@@ -1,6 +1,5 @@
 #include "AnimatedSprite.hpp"
 
-TextureManager AnimatedSprite::g_textureManager;
 std::unordered_map<std::string, std::shared_ptr<SpritesheetRecord>> AnimatedSprite::g_spritesheetCache;
 
 const std::shared_ptr<SpritesheetRecord> AnimatedSprite::getOrLoadSpritesheet(std::string path)
@@ -31,7 +30,7 @@ const std::shared_ptr<SpritesheetRecord> AnimatedSprite::getOrLoadSpritesheet(st
     return g_spritesheetCache.at(path);
 }
 
-AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_ips(ips), m_activeSpriteIndex(0)
+AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_ips(ips), m_activeSpriteIndex(-1)
 {
     setSprite(spritesheetPath);
 }
@@ -39,9 +38,5 @@ AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_ips(i
 void AnimatedSprite::setSprite(std::string spritesheetPath)
 {
     auto jsonSpriteSheet = getOrLoadSpritesheet(spritesheetPath);
-    m_spritesheetTexture = g_textureManager.getOrCreateTexture(jsonSpriteSheet->path);
     m_spritesheet = &jsonSpriteSheet->sprites;
-    
-    m_activeSprite.setTexture(*m_spritesheetTexture);
-    m_activeSprite.setTextureRect((*m_spritesheet)[0]);
 }

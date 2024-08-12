@@ -4,14 +4,14 @@
 #include <SFML/Graphics.hpp>
 
 #include "Components/AnimatedSprite.hpp"
-#include "Components/Transform.hpp"
+#include "Components/Sprite.hpp"
 #include "System.hpp"
 
-class AnimatedSpriteSystem : public System<AnimatedSprite, Transform>
+class AnimatedSpriteSystem : public System<Sprite, AnimatedSprite>
 {
 
 public:
-    virtual void update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<AnimatedSprite>, std::shared_ptr<Transform>> &entities) override;
+    virtual void update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<Sprite>, std::shared_ptr<AnimatedSprite>> &entities) override;
 };
 
 #endif // ANIMATEDSPRITESYSTEM_H_INCLUDED
