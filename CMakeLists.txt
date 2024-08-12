@@ -8,7 +8,9 @@ FetchContent_MakeAvailable(json)
 
 if(WIN32)
     set (BUILD_SHARED_LIBS OFF)
-endif()    
+else()
+    set (BUILD_SHARED_LIBS ON)
+endif()
 
 project(ECS VERSION 0.0.1 DESCRIPTION "Simple ECS build in C++" LANGUAGES CXX)
 
