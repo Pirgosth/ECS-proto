@@ -14,9 +14,11 @@ private:
     std::shared_ptr<sf::Texture> m_texture;
 public:
     Sprite(std::string texturePath, int zIndex = 0);
+    Sprite(std::shared_ptr<sf::Texture> texture, int zIndex = 0);
     sf::Sprite m_sprite;
     int m_zIndex;
     void setTexture(std::string texturePath);
+    void setTexture(std::shared_ptr<sf::Texture> texture);
 };
 
 #endif // SPRITE_H_INCLUDED
