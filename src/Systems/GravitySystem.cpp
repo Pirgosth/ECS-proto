@@ -1,4 +1,4 @@
-#include "GravitySystem.hpp"
+#include "Systems/GravitySystem.hpp"
 
 GravitySystem::GravitySystem(Engine &engine): m_engine(engine) {}
 

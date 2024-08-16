@@ -3,9 +3,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Components/AnimatedSprite.hpp"
-#include "Components/Sprite.hpp"
-#include "System.hpp"
+#include "../Components/AnimatedSprite.hpp"
+#include "../Components/Sprite.hpp"
+#include "../System.hpp"
 
 class AnimatedSpriteSystem : public System<Sprite, AnimatedSprite>
 {

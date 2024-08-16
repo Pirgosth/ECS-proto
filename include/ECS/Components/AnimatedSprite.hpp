@@ -9,8 +9,6 @@
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
 
-#include "TextureManager.hpp"
-
 using json = nlohmann::json;
 
 class AnimatedSpriteSystem;
@@ -19,6 +17,8 @@ struct SpritesheetRecord
 {   
     std::string path;
     std::vector<sf::IntRect> sprites;
+    std::vector<sf::Vector2f> pivots;
+    bool usePivots;
 }; typedef struct SpritesheetRecord SpritesheetRecord;
 
 class AnimatedSprite
@@ -26,9 +26,11 @@ class AnimatedSprite
 private:
     static std::unordered_map<std::string, std::shared_ptr<SpritesheetRecord>> g_spritesheetCache;
     const static std::shared_ptr<SpritesheetRecord> getOrLoadSpritesheet(std::string path);
+    const static std::shared_ptr<SpritesheetRecord> getOrLoadSpritesheetV1(std::string path);
+    const static std::shared_ptr<SpritesheetRecord> getOrLoadSpritesheetV2(std::string path);
 public:
     float m_ips;
-    std::vector<sf::IntRect> *m_spritesheet;
+    std::shared_ptr<SpritesheetRecord> m_spritesheet;
     int m_activeSpriteIndex;
     sf::Clock m_clock;
 

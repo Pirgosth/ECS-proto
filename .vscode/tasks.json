@@ -3,8 +3,8 @@
 	"tasks": [
 		{
 			"type": "cmake",
-			"label": "CMake: build",
-			"command": "build",
+			"label": "CMake: install",
+			"command": "install",
 			"targets": [
 				"all"
 			],

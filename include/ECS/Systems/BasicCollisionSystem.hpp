@@ -1,9 +1,9 @@
 #ifndef BASICCOLLISIONSYSTEM_H_INCLUDED
 #define BASICCOLLISIONSYSTEM_H_INCLUDED
 
-#include "System.hpp"
-#include "Components/Body.hpp"
-#include "Components/Transform.hpp"
+#include "../System.hpp"
+#include "../Components/Body.hpp"
+#include "../Components/Transform.hpp"
 
 class BasicCollisionSystem: public System<Transform, Body>
 {

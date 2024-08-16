@@ -1,4 +1,4 @@
-#include "RenderSystem.hpp"
+#include "Systems/RenderSystem.hpp"
 
 void RenderSystem::insertSorted(std::vector<std::tuple<std::shared_ptr<Sprite>, std::shared_ptr<Transform>>> &result, std::tuple<std::shared_ptr<Sprite>, std::shared_ptr<Transform>> toInsert)
 {
