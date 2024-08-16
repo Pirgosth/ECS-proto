@@ -17,7 +17,7 @@ int main()
     ECS ecs;
     Engine engine;
 
-    ecs.registerSystem(new AnimatedSpriteSystem());
+    ecs.registerSystem(new AnimatedSpriteSystem(engine.m_deltaTimeInSec));
     ecs.registerSystem(new BasicCollisionSystem());
     ecs.registerSystem(new GravitySystem(engine));
     ecs.registerSystem(new RenderSystem(window));

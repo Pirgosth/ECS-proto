@@ -74,7 +74,7 @@ const std::shared_ptr<SpritesheetRecord> AnimatedSprite::getOrLoadSpritesheetV2(
 
     return g_spritesheetCache.at(path);
 }
-AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_ips(ips), m_activeSpriteIndex(-1)
+AnimatedSprite::AnimatedSprite(std::string spritesheetPath, float ips) : m_elapsedTime(0), m_ips(ips), m_activeSpriteIndex(-1)
 {
     setSprite(spritesheetPath);
 }

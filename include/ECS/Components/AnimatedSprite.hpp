@@ -25,15 +25,16 @@ class AnimatedSprite
 {
 private:
     static std::unordered_map<std::string, std::shared_ptr<SpritesheetRecord>> g_spritesheetCache;
+    
     const static std::shared_ptr<SpritesheetRecord> getOrLoadSpritesheet(std::string path);
     const static std::shared_ptr<SpritesheetRecord> getOrLoadSpritesheetV1(std::string path);
     const static std::shared_ptr<SpritesheetRecord> getOrLoadSpritesheetV2(std::string path);
 public:
+    float m_elapsedTime;
     float m_ips;
     std::shared_ptr<SpritesheetRecord> m_spritesheet;
     int m_activeSpriteIndex;
-    sf::Clock m_clock;
-
+    
     AnimatedSprite(std::string spritesheetPath, float ips);
     void setSprite(std::string spritesheetPath);
 };

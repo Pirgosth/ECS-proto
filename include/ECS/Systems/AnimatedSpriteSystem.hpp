@@ -9,8 +9,10 @@
 
 class AnimatedSpriteSystem : public System<Sprite, AnimatedSprite>
 {
-
+private:
+    const float &m_deltaTime;
 public:
+    AnimatedSpriteSystem(const float &deltaTime);
     virtual void update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<Sprite>, std::shared_ptr<AnimatedSprite>> &entities) override;
 };
 
