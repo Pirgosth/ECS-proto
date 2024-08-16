@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-AnimatedSpriteSystem::AnimatedSpriteSystem(const float &deltaTime) : m_deltaTime(deltaTime){}
+AnimatedSpriteSystem::AnimatedSpriteSystem(const float &deltaTime) : m_deltaTime(deltaTime) {}
 
 void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::shared_ptr<Sprite>, std::shared_ptr<AnimatedSprite>> &entities)
 {
@@ -12,12 +12,15 @@ void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::sh
         if (animatedSprite->m_ips == 0 || animatedSprite->m_elapsedTime >= (1.0f / std::abs(animatedSprite->m_ips)))
         {
             auto ipsSign = animatedSprite->m_ips > 0 ? 1 : -1;
-            if (animatedSprite->m_activeSpriteIndex >= 0)
-                animatedSprite->m_activeSpriteIndex = ((int)animatedSprite->m_activeSpriteIndex + ipsSign) % animatedSprite->m_spritesheet->sprites.size();
-            else
+
+            if (animatedSprite->m_activeSpriteIndex < 0)
                 animatedSprite->m_activeSpriteIndex = 0;
+
+            if (animatedSprite->m_ips != 0)
+                animatedSprite->m_activeSpriteIndex = ((int)animatedSprite->m_activeSpriteIndex + ipsSign) % animatedSprite->m_spritesheet->sprites.size();
+
             auto currentSprite = animatedSprite->m_spritesheet->sprites[animatedSprite->m_activeSpriteIndex];
-            
+
             if (currentSprite.width < 0)
             {
                 sprite->m_sprite.setScale(sprite->m_sprite.getScale().x, -1);
