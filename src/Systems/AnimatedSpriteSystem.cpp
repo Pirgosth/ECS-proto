@@ -9,7 +9,7 @@ void AnimatedSpriteSystem::update(ArchetypeGraph::CompositeArchetypeView<std::sh
     for (auto [sprite, animatedSprite] : entities)
     {
         animatedSprite->m_elapsedTime += m_deltaTime;
-        if (animatedSprite->m_activeSpriteIndex == -1 || animatedSprite->m_ips == 0 || animatedSprite->m_elapsedTime >= (1.0f / std::abs(animatedSprite->m_ips)))
+        if (animatedSprite->m_ips == 0 || animatedSprite->m_elapsedTime >= (1.0f / std::abs(animatedSprite->m_ips)))
         {
             auto ipsSign = animatedSprite->m_ips > 0 ? 1 : -1;
             if (animatedSprite->m_activeSpriteIndex >= 0)

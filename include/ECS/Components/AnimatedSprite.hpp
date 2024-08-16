@@ -35,7 +35,7 @@ public:
     std::shared_ptr<SpritesheetRecord> m_spritesheet;
     int m_activeSpriteIndex;
     
-    AnimatedSprite(std::string spritesheetPath, float ips);
+    AnimatedSprite(std::string spritesheetPath, float ips, unsigned int startIndex = 0);
     void setSprite(std::string spritesheetPath);
 };
 
