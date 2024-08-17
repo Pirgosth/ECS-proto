@@ -11,7 +11,7 @@ class ECS
 private:
     EntityId m_entityCounter;
     ArchetypeGraph m_archetypeGraph;
-    std::set<std::shared_ptr<BaseSystem>> m_systems;
+    std::vector<std::shared_ptr<BaseSystem>> m_systems;
 
 public:
     ECS();

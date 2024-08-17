@@ -17,5 +17,5 @@ void ECS::deleteEntity(EntityId id)
 
 void ECS::registerSystem(BaseSystem *system)
 {
-    m_systems.emplace(std::shared_ptr<BaseSystem>(system));
+    m_systems.push_back(std::shared_ptr<BaseSystem>(system));
 }
