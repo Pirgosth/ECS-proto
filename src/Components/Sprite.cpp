@@ -2,12 +2,12 @@
 
 TextureManager Sprite::g_textureManager;
 
-Sprite::Sprite(std::string texturePath, int zIndex): m_zIndex(zIndex)
+Sprite::Sprite(std::string texturePath, int zIndex, bool enabled): m_zIndex(zIndex), m_enabled(enabled)
 {
     setTexture(texturePath); 
 }
 
-Sprite::Sprite(std::shared_ptr<sf::Texture> texture, int zIndex): m_zIndex(zIndex)
+Sprite::Sprite(std::shared_ptr<sf::Texture> texture, int zIndex, bool enabled): m_zIndex(zIndex), m_enabled(enabled)
 {
     setTexture(texture);
 }

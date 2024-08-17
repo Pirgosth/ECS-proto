@@ -13,10 +13,12 @@ private:
     static TextureManager g_textureManager;
     std::shared_ptr<sf::Texture> m_texture;
 public:
-    Sprite(std::string texturePath, int zIndex = 0);
-    Sprite(std::shared_ptr<sf::Texture> texture, int zIndex = 0);
+    Sprite(std::string texturePath, int zIndex = 0, bool enabled = true);
+    Sprite(std::shared_ptr<sf::Texture> texture, int zIndex = 0, bool enabled = true);
     sf::Sprite m_sprite;
     int m_zIndex;
+    bool m_enabled;
+
     void setTexture(std::string texturePath);
     void setTexture(std::shared_ptr<sf::Texture> texture);
 };
