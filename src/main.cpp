@@ -7,7 +7,6 @@
 #include "System.hpp"
 #include "Systems/AnimatedSpriteSystem.hpp"
 #include "Systems/BasicCollisionSystem.hpp"
-#include "Systems/GravitySystem.hpp"
 #include "Systems/SpriteRenderSystem.hpp"
 
 int main()
@@ -19,7 +18,6 @@ int main()
 
     ecs.registerSystem(new AnimatedSpriteSystem(engine.m_deltaTimeInSec));
     ecs.registerSystem(new BasicCollisionSystem());
-    ecs.registerSystem(new GravitySystem(engine));
     ecs.registerSystem(new SpriteRenderSystem(window));
 
     for (int i = 0; i < 27; i++)

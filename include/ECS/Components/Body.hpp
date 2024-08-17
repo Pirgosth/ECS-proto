@@ -6,7 +6,6 @@
 class Body
 {
 public:
-    Body();
     sf::Vector2f m_acceleration;
     sf::Vector2f m_speed;
 };
