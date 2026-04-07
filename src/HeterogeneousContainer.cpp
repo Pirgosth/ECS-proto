@@ -79,3 +79,9 @@ ArchetypeSignature HeterogeneousContainer::computeSignature()
 
     return signature;
 }
+
+HeterogeneousContainer &HeterogeneousContainer::operator=(const HeterogeneousContainer &x)
+{
+    m_containers = x.clone().m_containers;
+    return *this;
+}

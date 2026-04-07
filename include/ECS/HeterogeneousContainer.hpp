@@ -77,27 +77,30 @@ private:
     unsigned int m_erasedCount;
 
     std::unordered_map<TypeId, std::shared_ptr<BaseContainer>> m_containers;
+    HeterogeneousContainer clone() const;
 
 public:
     HeterogeneousContainer();
     HeterogeneousContainer(const HeterogeneousContainer &x);
-    HeterogeneousContainer clone() const;
     template <typename... Components>
     class HeterogeneousContainerView
     {
         HeterogeneousContainer &parent;
 
     public:
-        class iterator : public std::iterator<
-                             std::input_iterator_tag,    // iterator_category
-                             std::tuple<Components &...> // value_type
-                             >
+        class iterator
         {
         private:
             HeterogeneousContainer *m_parent;
             unsigned int m_currentIndex;
 
         public:
+            using iterator_category = std::input_iterator_tag;
+            using value_type = std::tuple<Components &...>;
+            using difference_type = std::ptrdiff_t;
+            using pointer = std::tuple<Components &...>*;
+            using reference = std::tuple<Components &...>&;
+
             explicit iterator(HeterogeneousContainer *_parent, unsigned int currentIndex) : m_parent(_parent), m_currentIndex(currentIndex) {}
             
             iterator &operator++()
@@ -167,6 +170,7 @@ public:
     void copy(const HeterogeneousContainer &from, int index);
     unsigned int size() const;
     ArchetypeSignature computeSignature();
+    HeterogeneousContainer& operator=(const HeterogeneousContainer &x);
 };
 
 template <typename T>

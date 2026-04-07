@@ -57,7 +57,7 @@ template <typename Component>
 inline Archetype Archetype::extend()
 {
     auto extended = Archetype();
-    extended.m_components = m_components.clone();
+    extended.m_components = m_components;
     extended.m_components.addContainer<Component>();
 
     return extended;
@@ -67,7 +67,7 @@ template <typename Component>
 inline Archetype Archetype::reduce()
 {
     auto reduced = Archetype();
-    reduced.m_components = m_components.clone();
+    reduced.m_components = m_components;
     reduced.m_components.removeContainer<Component>();
 
     return reduced;

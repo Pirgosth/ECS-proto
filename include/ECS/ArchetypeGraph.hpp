@@ -74,10 +74,7 @@ public:
     template <typename... Components>
     class CompositeArchetypeView
     {
-        class iterator : public std::iterator<
-                             std::input_iterator_tag,    // iterator_category
-                             std::tuple<Components &...> // value_type
-                             >
+        class iterator
         {
         private:
             typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator m_current;
@@ -86,6 +83,12 @@ public:
             typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator m_currentViewEnd;
 
         public:
+            using iterator_category = std::input_iterator_tag;
+            using value_type = std::tuple<Components &...>;
+            using difference_type = std::ptrdiff_t;
+            using pointer = std::tuple<Components &...>*;
+            using reference = std::tuple<Components &...>&;
+            
             explicit iterator(typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator current,
                               std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>> &archetypeViews,
                               typename std::vector<HeterogeneousContainer::HeterogeneousContainerView<Components...>>::iterator currentView) : m_current(current), m_archetypeViews(archetypeViews), m_currentView(currentView), m_currentViewEnd(currentView == archetypeViews.end() ? typename HeterogeneousContainer::HeterogeneousContainerView<Components...>::iterator(nullptr, -1) : (*currentView).end()) {}
